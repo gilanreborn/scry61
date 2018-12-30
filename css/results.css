@@ -1,0 +1,23 @@
+.results {
+	grid-area: results;
+	display: none;
+}
+
+.results.show {
+	display: block;
+}
+
+
+.results__options {
+	font-family: Cinzel;
+}
+
+.results__list {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.results__list-item {
+	max-width: 25%;
+	display: inline-block;
+}

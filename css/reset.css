@@ -1,0 +1,50 @@
+* {
+  margin: 0;
+  padding: 0;
+  color: inherit;
+  box-sizing: border-box;
+}
+
+html {
+  --theme-color-1: #ccc;
+  --highlight-color-1: color-mod(var(--theme-color-1) tint(59%));
+  --theme-color-2: #808;
+  --theme-color-3: #333;
+  color: var(--theme-color-1);
+  background-color: var(--theme-color-3);
+  font-size: 16px;
+  /* font-size: calc(14px + 3 * ((100vw - 320px) / 1000)); */
+}
+
+body {
+  font-family: Century, serif;
+  position: relative;
+}
+
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+ul, li {
+  list-style: none;
+}
+
+img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #999;
+  cursor: pointer;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #666;
+}

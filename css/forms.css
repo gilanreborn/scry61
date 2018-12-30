@@ -1,0 +1,53 @@
+input, select {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #666666;
+  outline-color: var(--theme-color-1);
+  font-size: 1.25rem;
+  height: 1.5em;
+  border-radius: 0;
+}
+
+input:focus, select:focus, input:hover, select:hover {
+  outline: none;
+  border-bottom-color: var(--theme-color-1);
+}
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  height: 2rem;
+}
+
+label {
+  width: 100%;
+}
+
+[tabindex] {
+  outline: none;
+}
+
+fieldset {
+  padding: 0 .5em;
+}
+
+input[type="checkbox"] {
+  display: none;
+}
+
+input[type="checkbox"] + label,
+input[type="radio"] + label {
+  display: block;
+  border: 3px solid black;
+  cursor: pointer;
+}
+
+input[type="checkbox"]:checked + label,
+input[type="radio"]:checked + label {
+  border-color: var(--theme-color-1);
+}
+
+input[type="radio"] {
+  display: none;
+}

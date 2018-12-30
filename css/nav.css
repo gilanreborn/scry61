@@ -1,0 +1,145 @@
+
+/*NAVBAR*/
+header {
+  grid-column: span 3;
+  grid-area: head;
+}
+
+.nav {
+  font-family: Cinzel;
+  display: grid;
+  grid-template-areas: "nav title more";
+  grid-template-columns: 1fr 1fr 1fr;
+  width: 100%;
+}
+
+.nav__icon {
+  position: fixed;
+  z-index: 11;
+  height: 21px;
+  width: 21px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  padding: 16px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-sizing: content-box;
+  outline: none;
+}
+
+.nav__icon hr {
+  all: unset;
+  border: 1px solid var(--theme-color-1);
+  background: var(--theme-color-1);
+  transition: all .5s ease-in-out;
+  width: 20px;
+  font-size: 16px;
+  box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.25);
+}
+
+.nav__icon:hover hr,
+.nav__icon:focus hr {
+  border: 1px solid var(--highlight-color-1);
+  background: var(--highlight-color-1);
+}
+
+.nav.open .nav__icon hr {
+  box-shadow: none;
+}
+.nav.open .nav__icon hr:nth-child(1) {
+  transform: translateY(7.5px) rotate(225deg);
+}
+.nav.open .nav__icon hr:nth-child(2) {
+  width: 0;
+  border: 2px solid transparent;
+  background: transparent;
+  transform: rotate(225deg);
+}
+.nav.open .nav__icon hr:nth-child(3) {
+  transform: translateY(-7.5px) rotate(315deg);
+}
+
+.nav__menu {
+  display: none;
+  width: 240px;
+  position: fixed;
+  text-transform: uppercase;
+  background-color: var(--theme-color-3);
+  transition: all 0.2s ease-in-out;
+  z-index: 10;
+  /* box-shadow: 0 0 100vw 100vw rgba(0, 0, 0, 0.5); */
+}
+
+.nav.open .nav__menu {
+  display: flex;
+}
+
+.nav__menu__list {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+}
+
+.nav__menu__list > li {
+  width: 100%;
+}
+
+.nav__menu__list a.active {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.nav__menu__list-item--spacer {
+  height: 2.5em;
+  display: block;
+}
+
+.nav__close {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.25);
+  z-index: 1;
+  display: none;
+  height: 100%;
+  width: 100%;
+}
+
+.nav.open .nav__close {
+  display: block;
+}
+
+nav a {
+  display: block;
+  padding: 1em;
+  text-decoration: none;
+  border-left: 1px solid transparent;
+  outline: none;
+  cursor: pointer;
+}
+
+nav a:hover,
+nav a:focus {
+  border-left-color: var(--highlight-color-1);
+}
+
+.nav__title {
+  font-family: Cinzel Decorative;
+  grid-area: title;
+  font-size: 2.5em;
+  margin: auto;
+}
+
+.nav__more {
+  grid-area: more;
+  text-align: right;
+}
+
+.theme-color-setter {
+  flex-direction: column;
+}
+
+.theme-color-setter-options {
+  display: flex;
+}
