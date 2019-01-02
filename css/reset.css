@@ -7,7 +7,7 @@
 
 html {
   --theme-color-1: #ccc;
-  --highlight-color-1: color-mod(var(--theme-color-1) tint(59%));
+  --highlight-color-1: #fff;
   --theme-color-2: #808;
   --theme-color-3: #333;
   color: var(--theme-color-1);

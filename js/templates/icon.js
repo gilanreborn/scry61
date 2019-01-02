@@ -2,7 +2,7 @@ import { html, svg, render } from 'https://unpkg.com/lit-html?module';
 
 export default function icon(name) {
 	const paths = (symbol) => {
-		switch (symbol) {
+		switch (symbol.toUpperCase()) {
 			case 'W': return '/assets/svgs/W.svg';
 			case 'U': return '/assets/svgs/U.svg';
 			case 'B': return '/assets/svgs/B.svg';
@@ -56,19 +56,19 @@ export default function icon(name) {
 			case 'R/P': return '/assets/svgs/RP.svg';
 			case 'G/P': return '/assets/svgs/GP.svg';
 			// rarity images
-			case 'Common':      return 'https://cdn4.iconfinder.com/data/icons/free-social-media-icons/48/Black_button.png';
-			case 'Uncommon':    return 'https://cdn4.iconfinder.com/data/icons/free-social-media-icons/16/Silver_button.png';
-			case 'Rare':        return 'https://cdn4.iconfinder.com/data/icons/free-social-media-icons/16/Yellow_button.png';
-			case 'Mythic Rare': return 'https://cdn4.iconfinder.com/data/icons/free-social-media-icons/16/Orange_button.png';
-			case 'Special':     return 'https://magidex.com/extstatic/symbol/set/TSP/s.svg';
+			case 'COMMON':      return '/assets/svgs/rarity_common.svg';
+			case 'UNCOMMON':    return '/assets/svgs/rarity_uncommon.svg';
+			case 'RARE':        return '/assets/svgs/rarity_rare.svg';
+			case 'MYTHIC':      return '/assets/svgs/rarity_mythic.svg';
+			case 'SPECIAL':     return '/assets/svgs/rarity_special.svg';
 			// type symbols
-			case 'Artifact':      return '/assets/svgs/type_artifact.svg';
-			case 'Creature':      return '/assets/svgs/type_creature.svg';
-			case 'Enchantment':   return '/assets/svgs/type_enchantment.svg';
-			case 'Land':          return '/assets/svgs/type_land.svg';
-			case 'Instant':       return '/assets/svgs/type_instant.svg';
-			case 'Planeswalker':  return '/assets/svgs/type_planeswalker.svg';
-			case 'Sorcery':       return '/assets/svgs/type_sorcery.svg';
+			case 'ARTIFACT':      return '/assets/svgs/type_artifact.svg';
+			case 'CREATURE':      return '/assets/svgs/type_creature.svg';
+			case 'ENCHANTMENT':   return '/assets/svgs/type_enchantment.svg';
+			case 'LAND':          return '/assets/svgs/type_land.svg';
+			case 'INSTANT':       return '/assets/svgs/type_instant.svg';
+			case 'PLANESWALKER':  return '/assets/svgs/type_planeswalker.svg';
+			case 'SORCERY':       return '/assets/svgs/type_sorcery.svg';
 			default: return false;
 		}
 	};

@@ -34,7 +34,7 @@ export default class UI extends Component {
     const self = this;
     fetchAllSets().then(AllSets => {
       const AllCards = self.buildAllCards(AllSets);
-      const dummy = { name: '', type: '', text: '', colors: [], cmc: 0, rarities: [], };
+      const dummy = { name: '', type: '', text: '', colors: [], convertedManaCost: 0, rarities: [], };
       const cards = Object.values(AllCards)
         .filter(c => c.name)
         .map(c => Object.assign({}, dummy, c));

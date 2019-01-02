@@ -1,0 +1,38 @@
+.expando {
+	overflow: hidden;
+}
+
+.expando .expando-box {
+	position: relative;
+	overflow: hidden;
+	border: 1px solid var(--theme-color-1);
+	height: auto;
+	max-height: 0;
+	transition: all .25s ease-out;
+	padding: 0 .5em;
+}
+
+.expando.open .expando-box {
+	max-height: 200px;
+}
+
+.expando-arrow {
+	cursor: pointer;
+	text-align: center;
+	transform: scaleX(2) scaleY(.5);
+	margin-top: -.5em;
+	color: var(--theme-color-1);
+	perspective: 1000px;
+  -webkit-perspective: 1000;
+	transform-style: preserve-3d;
+}
+
+.expando.open .expando-arrow {
+	transform: scaleX(2) scaleY(.5) rotateX(180deg);
+	margin-top: -1em;
+}
+
+.expando-arrow:hover {
+	color: var(--highlight-color-1);
+}
+

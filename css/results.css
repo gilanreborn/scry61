@@ -18,6 +18,10 @@
 }
 
 .results__list-item {
-	max-width: 25%;
 	display: inline-block;
+}
+
+.active {
+  font-weight: bold;
+  text-decoration: underline;
 }

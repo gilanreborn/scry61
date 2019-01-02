@@ -7,7 +7,7 @@ export default function searchInput(options) {
 		<fieldset class="search__fieldset">
 			<legend class="search__fieldset__legend">${legend}</legend>
 			${input(options)}
-			<button class="search__input--clear" @click=${clear}>X</button>
+			<button class="search__fieldset__clear" @click=${clear}>X</button>
 		</fieldset>
 	`
 }

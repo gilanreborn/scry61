@@ -5,7 +5,6 @@ import searchInput from '../templates/searchInput.js';
 import input from '../templates/input.js';
 import { html, svg, render } from 'https://unpkg.com/lit-html?module';
 
-
 export default class Search extends Component {
 	constructor(options) {
 		super(options);
@@ -14,34 +13,44 @@ export default class Search extends Component {
 	buildSearchInput({ legend, clear, classList, onChange, value, placeholder }) {
 		return html`
 			<fieldset class="search__fieldset">
-				<legend class="search__fieldset__legend">${legend}</legend>
-				<input type="text"
-					class="search__fieldset__input ${classList.toLowerCase()}"
-					@change=${onChange}
-					@keyup=${e => e.key === 'Enter' && onChange(e)}
-					.value="${value}"
-					.placeholder=${placeholder || ''}
-				>
-				<button class="search__input--clear" @click=${clear}>&times;</button>
+				<legend>${legend}</legend>
+				<h3 class="search__fieldset__title">${legend}</h3>
+				<div class="search__fieldset__group">
+					<label class="search__fieldset__label">
+						<input type="text"
+							class="search__fieldset__input ${classList.toLowerCase()}"
+							@change=${onChange}
+							@keyup=${e => e.target === this && e.key === 'Enter' && onChange(e)}
+							.value="${value}"
+							.placeholder=${placeholder || ''}
+						>
+					</label>
+					<button type="button"
+						class="search__fieldset__clear clear-search-field"
+						title="clear"
+						@click=${clear}
+					>&times;
+					</button>
+				</div>
 			</fieldset>
 		`
 	}
 
-	buildColorPicker(colors, currentColors) {
-		const options = colors.map(({color, symbol}) => {
-			return { checked: currentColors.includes(color), click: this.updateCardColorField, symbol, value: color };
+	buildPicker(values, currentValue, updateCallback) {
+		const options = values.map(({ value, symbol }) => {
+			return { checked: currentValue.includes(value), click: updateCallback.bind(this), symbol, value };
 		});
-		return options.map(opt => html`<li>${this.buildCheckbox(opt)}</li>`)
+		return options.map(opt => html`<li>${this.buildCheckbox(opt)}</li>`);
 	}
 
-	buildCheckbox({ checked, click, symbol, value }) {
+	buildCheckbox({ checked, click, symbol, value, title }) {
 		return html`
 			<input type="checkbox" id="${symbol}" name="${symbol}" ?checked=${checked} @click=${click} symbol=${symbol} value=${value}>
-			<label class="checkbox__label" for="${symbol}">${icon(symbol)}</label>
+			<label class="checkbox__label" for="${symbol}" title="${title || value}">${icon(symbol)}</label>
 		`
 	}
 
-	buildSearchRefiner({ type, }, currentRefinement) {
+	buildSearchRefiner({ type, click }, currentRefinement) {
 		const options = 'AND OR NOT EXACTLY ONLY EXCLUDE_UNSELECTED'.split(' ');
 		const searchRefinements = options.map((opt, idx) => {
 			const id = type + opt + idx;
@@ -52,7 +61,7 @@ export default class Search extends Component {
 						class="search-refiner__radio__button"
 						name="radio-group--${type}"
 						?checked=${currentRefinement === opt}
-						@click=${this.updateCardColorOptions}
+						@click=${click}
 						value=${opt}
 					>
 					<label class="search-refiner__radio__label" for="${id}">${opt.replace('_', ' ')}</label>
@@ -65,6 +74,39 @@ export default class Search extends Component {
 		`;
 	}
 
+	buildRangeSetter({ name, min, max, callback }) {
+		return html`
+			<span class="range-setter range-setter--${name}">
+				<input type="number"
+					class="range-setter__input range-setter__input--min"
+					@change=${e => callback({ min: e.target.value, max }, name)}
+					.value=${min === max || isNaN(min) ? '' : min }
+					placeholder="MIN"
+				/>
+				<span class="range-setter__divider"> ≤ </span>
+				<input type="number"
+					class="range-setter__input range-setter__input--mid"
+					@change=${e => callback({ min: e.target.value, max: e.target.value }, name)}
+					.value=${min !== max || isNaN(max) || isNaN(min) ? '' : max}
+					.placeholder=${name.toUpperCase()}
+				/>
+				<span class="range-setter__divider"> ≤ </span>
+				<input type="number"
+					class="range-setter__input range-setter__input--max"
+					@change=${e => callback({ min, max: e.target.value }, name)}
+					.value=${min === max || isNaN(max) ? '' : max}
+					placeholder="MAX"
+				/>
+				<button type="button"
+					class="search__fieldset__clear clear-search-field"
+					title="clear"
+					@click=${e => e.target.closest('.range-setter')}
+				>&times;
+				</button>
+			</span>
+		`
+	}
+
 	optionsFor(fieldName) {
 		const self = this;
 		return {
@@ -73,39 +115,81 @@ export default class Search extends Component {
 			onChange: e => self[`updateCard${fieldName}Field`](e),
 			classList: `search__fieldset__input--card-${fieldName}`,
 			clear: self.clearCard(fieldName),
+			placeholder: fieldName,
 		}
 	}
 
+	// UPDATER FUNCTIONS
 	updateCardNameField(e) {
 		const name = e.target.value.toLowerCase();
-		window.app.dispatch({
-			type: 'SET_CARD_NAME',
-			payload: name,
-		});
+		window.app.dispatch({ type: 'SET_CARD_NAME', payload: name, });
 		window.app.dispatch({
 			type: 'ADD_FILTER',
 			payload: { byName: card => card.name.toLowerCase().indexOf(name) !== -1, },
 		});
 	}
 
-	updateCardColorField(e) {
+	updateColor(e) {
+		const colors = q('.color-picker__list input:checked').map(el => el.value);
+		const filterOption = q('[name="radio-group--color-picker"]:checked')[0].value;
+		const filterObject = this.abstractedFilterOptions('colors', colors, filterOption);
+		window.app.dispatch({ type: 'SET_CARD_COLORS', payload: colors });
+		window.app.dispatch({ type: 'SET_CARD_COLOR_OPTIONS', payload: filterOption });
+		window.app.dispatch({ type: 'ADD_FILTER', payload: filterObject });
 	}
-	updateCardColorOptions(e) {
-		debugger;
+
+	updateRarity(e) {
+		const rarity = q('.rarity-picker__list input:checked').map(el => el.value);
+		const filterOption = q('[name="radio-group--rarity-picker"]:checked')[0].value;
+		const filterObject = this.abstractedFilterOptions('rarities', rarity, filterOption);
+		window.app.dispatch({ type: 'SET_CARD_RARITY', payload: rarity });
+		window.app.dispatch({ type: 'SET_CARD_RARITY_OPTIONS', payload: filterOption });
+		window.app.dispatch({ type: 'ADD_FILTER', payload: filterObject });
+	}
+
+	updateFormat(e) {
+		const format = e.target.value.toLowerCase();
+		const filterFn = card => card.legalities[format] === 'Legal';
+		const any = card => true;
+		const byFormat = format === 'any' ? any : filterFn;
+		window.app.dispatch({ type: 'SET_CARD_FORMAT', payload: format, });
+		window.app.dispatch({ type: 'ADD_FILTER', payload: { byFormat }, })
+	}
+
+	updateType(e) {
+		const type = q('.type-picker input[type="text"]')[0].value;
+		const byType = card => card.type.toLowerCase().indexOf(type) !== -1;
+		const supertypes = q('.type-picker__list input:checked').map(el => el.value);
+		const filterOption = q('[name="radio-group--type-picker"]:checked')[0].value;
+		const filterObject = this.abstractedFilterOptions('types', supertypes, filterOption);
+		window.app.dispatch({ type: 'SET_CARD_TYPE', payload: type, });
+		window.app.dispatch({ type: 'SET_CARD_SUPERTYPES', payload: supertypes, });
+		window.app.dispatch({ type: 'SET_CARD_SUPERTYPE_OPTIONS', payload: filterOption, });
+		window.app.dispatch({ type: 'ADD_FILTER', payload: { byType }, });
+		window.app.dispatch({ type: 'ADD_FILTER', payload: filterObject });
 	}
 
 	updateCardTextField(e) {
 		const text = e.target.value;
-		window.app.dispatch({
-			type: 'SET_CARD_TYPE',
-			payload: text,
-		});
-		window.app.dispatch({
-			type: 'ADD_FILTER',
-			payload: {
-				byText: card => text.split(' ').reduce((memo, term) => memo && card.text.toLowerCase().indexOf(term) !== -1, true),
-			},
-		});
+		const byText = card => text.spit(' ').reduce((memo, term) => {
+			return memo && card.text.toLowerCase().indexOf(term) !== -1;
+		}, true);
+		window.app.dispatch({ type: 'SET_CARD_TYPE', payload: text });
+		window.app.dispatch({ type: 'ADD_FILTER', payload: { byText }, });
+	}
+
+	updateRangeField({ min, max }, abbr) {
+		const attr = { pwr: 'power', tgh: 'toughness', cmc: 'convertedManaCost' }[abbr];
+    // need to handle input values and filter values slightly differently in case input is empty string
+    let [minVal, maxVal] = [parseInt(min), parseInt(max)];
+    if ( isNaN(minVal) ) { minVal = -999; }
+    if ( isNaN(maxVal) ) { maxVal = 999; }
+    let rangeFilter = {};
+		rangeFilter[attr] = card => minVal <= card[attr] && card[attr] <= maxVal;
+
+		window.app.dispatch({ type: 'SET_CARD_' + abbr.toUpperCase(), payload: { min, max }});
+		window.app.dispatch({ type: 'ADD_FILTER', payload: rangeFilter });
+		// dispatch
 	}
 
 	clearCard(field) {
@@ -121,73 +205,174 @@ export default class Search extends Component {
 		}
 	}
 
+	clearAll() {
+		window.app.dispatch({ type: 'RESTORE_SEARCH_DEFAULTS' });
+		window.app.dispatch({ type: 'RESTORE_FILTER_DEFAULTS' });
+	}
+
+	abstractedFilterOptions(filterTarget, filterValue, filterOption) {
+		console.log([ filterTarget, filterValue, filterOption ]);
+    const filterFuncs = {
+      'AND': card => filterValue.reduce((memo, target) => memo && card[filterTarget].includes(target), true),
+      'OR': card => filterValue.reduce((memo, target) => memo || card[filterTarget].includes(target), false),
+      'NOT': card => filterValue.reduce((memo, target) => memo && !card[filterTarget].includes(target), true),
+      'EXACTLY': card => {
+        return new Set([
+          card[filterTarget].length,
+          filterValue.length,
+          new Set(card[filterTarget].concat(filterValue)).size
+        ]).size === 1;
+      },
+      'ONLY': card => card[filterTarget].length && card[filterTarget].reduce((memo, color) => memo && filterValue.includes(color), true),
+      'EXCLUDE_UNSELECTED': card => card[filterTarget].reduce((memo, color) => memo && filterValue.includes(color), true),
+      'ANY': card => true,
+      'COLORLESS': card => card[filterTarget].length === 0,
+    };
+    let filterObj = {};
+    filterObj[filterTarget] = filterValue.length ? filterFuncs[filterOption] : filterFuncs['ANY'];
+		return filterObj;
+  }
+
 	search(e) {
 		e.preventDefault();
+		e.stopPropagation();
 	}
 
 	update(props, oldProps) {
-		const { cardName, cardText, colors, colorOptions } = props.search;
+		const {
+				cardName,
+				cardType,
+				cardSuperType,
+				cardSuperTypeOptions,
+				cardText,
+				colors,
+				colorOptions,
+				rarity,
+				rarityOptions,
+				cmc,
+				power,
+				toughness,
+		} = props.search;
+
 		const view = html`
 			<form id="search" @submit=${this.search}>
 				<h2 class="search__header"> SEARCH </h2>
 				${this.buildSearchInput({ ...this.optionsFor('Name'), value: cardName })}
 				<fieldset class="search__fieldset color-picker">
 					<legend>Color</legend>
-					<ul class="accordion"
-						@keyup="${e => e.key === 'Enter' && e.currentTarget.classList.toggle('open')}"
-						tabindex="0"
-					>
-						<li class="accordion__title"
-							@click="${e => e.currentTarget.parentElement.classList.toggle('open')}"
-						>
-							<ul class="color-picker__list">
-								${this.buildColorPicker([
-									{ color: 'White', symbol: 'W' },
-									{ color: 'Blue', symbol: 'U' },
-									{ color: 'Black', symbol: 'B' },
-									{ color: 'Red', symbol: 'R' },
-									{ color: 'Green', symbol: 'G' },
-								], colors)}
-							</ul>
-							<span class="accordion__arrow">${svgIcon('chevron')}</span>
-						</li>
-						<li>
-							${this.buildSearchRefiner({ type: 'color-picker' }, colorOptions)}
-						</li>
+					<h3 class="search__fieldset__title">Color</h3>
+					<ul class="color-picker__list">
+						${this.buildPicker('WUBRG'.split('').map(c => ({ value: c, symbol: c })), colors, this.updateColor.bind(this))}
 					</ul>
+					<div class="expando search__fieldset__more-options">
+						<div class="expando-box">
+							${this.buildSearchRefiner({ type: 'color-picker', click: this.updateColor.bind(this) }, colorOptions)}
+						</div>
+						<div class="expando-arrow" @click=${e => e.target.parentElement.classList.toggle('open')}>
+							&#9660;
+						</div>
+					</div>
 				</fieldset>
-				<fieldset>
+				<fieldset class="search__fieldset type-picker">
 					<legend>Type</legend>
+					<h3 class="search__fieldset__title">Type</h3>
+					<div class="search__fieldset__group">
+						<label class="search__fieldset__label">
+							<input type="text"
+								class="search__fieldset__input"
+								@change=${this.updateType.bind(this)}
+								.value="${cardType}"
+								placeholder="Type"
+							>
+						</label>
+						<button type="button"
+							class="search__fieldset__clear clear-search-field"
+							title="clear"
+							@click=${this.clearCard('Type')}
+						>&times;
+						</button>
+					</div>
+
+					<div class="expando search__fieldset__more-options">
+						<div class="expando-box">
+							<li>
+								<ul class="type-picker__list">
+									${this.buildPicker(
+										'Artifact Creature Enchantment Land Instant Planeswalker Sorcery'.split(' ').map(t => {
+											return { value: t, symbol: t };
+										}), cardType, this.updateType.bind(this))}
+								</ul>
+							</li>
+							<li>
+								${this.buildSearchRefiner({ type: 'type-picker', click: this.updateType.bind(this) }, cardSuperTypeOptions)}
+							</li>
+						</div>
+						<div class="expando-arrow" @click=${e => e.target.parentElement.classList.toggle('open')}>
+							&#9660;
+						</div>
+					</div>
 				</fieldset>
-				${this.buildSearchInput({ ...this.optionsFor('Text'), value: cardText })}
-				<fieldset>
-					<legend>CMC:</legend>
-					Range
+					${this.buildSearchInput({ ...this.optionsFor('Text'), value: cardText })}
+				<fieldset class="search__fieldset">
+					<legend>CMC</legend>
+					<h3 class="search__fieldset__title">CMC</h3>
+					<div class="search__fieldset__group">
+						${this.buildRangeSetter({ name: 'cmc', min: cmc.min, max: cmc.max, callback: this.updateRangeField })}
+					</div>
 				</fieldset>
-				<fieldset>
-					<legend>Power:</legend>
-					Range
+				<fieldset class="search__fieldset">
+					<legend>Power</legend>
+					<h3 class="search__fieldset__title">Power</h3>
+					<div class="search__fieldset__group">
+						${this.buildRangeSetter({ name: 'pwr', min: power.min, max: power.max, callback: this.updateRangeField })}
+					</div>
 				</fieldset>
-				<fieldset>
-					<legend>Tough:</legend>
-					Range
+				<fieldset class="search__fieldset">
+					<legend>Tough</legend>
+					<h3 class="search__fieldset__title">Tough</h3>
+					<div class="search__fieldset__group">
+						${this.buildRangeSetter({ name: 'tgh', min: toughness.min, max: toughness.max, callback: this.updateRangeField })}
+					</div>
 				</fieldset>
-				<fieldsent>
+				<fieldset class="search__fieldset rarity-picker">
 					<legend>Rarity</legend>
-				</fieldsent>
-				<fieldset>
+					<h3 class="search__fieldset__title">Rarity</h3>
+					<ul class="rarity-picker__list">
+						${this.buildPicker('common uncommon rare mythic special'.split(' ').map(r => {
+							return { value: r, symbol: r };
+						}), rarity, this.updateRarity.bind(this))}
+					</ul>
+					<div class="expando search__fieldset__more-options">
+						<div class="expando-box">
+							${this.buildSearchRefiner({ type: 'rarity-picker', click: this.updateRarity.bind(this) }, rarityOptions)}
+						</div>
+						<div class="expando-arrow" @click=${e => e.target.parentElement.classList.toggle('open')}>
+							&#9660;
+						</div>
+					</div>
+				</fieldset>
+				<fieldset class="search__fieldset">
 					<legend>Format:</legend>
-					<select>
-						<option>Any</option>
-						<option>Standard</option>
-						<option>Modern</option>
-						<option>Legacy</option>
-						<option>Vintage</option>
-						<option>Commander</option>
-					</select>
+					<h3 class="search__fieldset__title">Format</h3>
+					<div class="search__fieldset__group">
+						<label class="search__fieldset__label">
+							<select @change=${this.updateFormat}>
+								<option>Any</option>
+								<option>1v1</option>
+								<option>Commander</option>
+								<option>Duel</option>
+								<option>Frontier</option>
+								<option>Legacy</option>
+								<option>Modern</option>
+								<option>Pauper</option>
+								<option>Penny</option>
+								<option>Vintage</option>
+							</select>
+						</label>
+					</div>
 				</fieldset>
 				<fieldset>
-					<button>Clear All</button>
+					<button type="button" @click=${this.clearAll}>Clear All</button>
 				</fieldset>
 				<fieldset class='search-fieldset mobile-only'>
 					<button>See Results</button>
