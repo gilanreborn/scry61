@@ -8,6 +8,10 @@ import { html, svg, render } from 'https://unpkg.com/lit-html?module';
 export default class Search extends Component {
 	constructor(options) {
 		super(options);
+
+		this._state = {
+			mode: 'comfortable',
+		};
 	}
 
 	buildSearchInput({ legend, clear, classList, onChange, value, placeholder }) {
@@ -25,13 +29,13 @@ export default class Search extends Component {
 							.placeholder=${placeholder || ''}
 						>
 					</label>
-					<button type="button"
-						class="search__fieldset__clear clear-search-field"
-						title="clear"
-						@click=${clear}
-					>&times;
-					</button>
 				</div>
+				<button type="button"
+					class="search__fieldset__clear clear-search-field"
+					title="clear"
+					@click=${clear}
+				>&times;
+				</button>
 			</fieldset>
 		`
 	}
@@ -74,36 +78,38 @@ export default class Search extends Component {
 		`;
 	}
 
-	buildRangeSetter({ name, min, max, callback }) {
+	buildRangeSetter({ name, min, max, callback, clear }) {
 		return html`
-			<span class="range-setter range-setter--${name}">
-				<input type="number"
-					class="range-setter__input range-setter__input--min"
-					@change=${e => callback({ min: e.target.value, max }, name)}
-					.value=${min === max || isNaN(min) ? '' : min }
-					placeholder="MIN"
-				/>
-				<span class="range-setter__divider"> ≤ </span>
-				<input type="number"
-					class="range-setter__input range-setter__input--mid"
-					@change=${e => callback({ min: e.target.value, max: e.target.value }, name)}
-					.value=${min !== max || isNaN(max) || isNaN(min) ? '' : max}
-					.placeholder=${name.toUpperCase()}
-				/>
-				<span class="range-setter__divider"> ≤ </span>
-				<input type="number"
-					class="range-setter__input range-setter__input--max"
-					@change=${e => callback({ min, max: e.target.value }, name)}
-					.value=${min === max || isNaN(max) ? '' : max}
-					placeholder="MAX"
-				/>
-				<button type="button"
-					class="search__fieldset__clear clear-search-field"
-					title="clear"
-					@click=${e => e.target.closest('.range-setter')}
-				>&times;
-				</button>
-			</span>
+			<div class="search__fieldset__group">
+				<span class="range-setter range-setter--${name}">
+					<input type="number"
+						class="range-setter__input range-setter__input--min"
+						@change=${e => callback({ min: e.target.value, max }, name)}
+						.value=${min === max || isNaN(min) ? '' : min }
+						placeholder="MIN"
+					/>
+					<span class="range-setter__divider"> ≤ </span>
+					<input type="number"
+						class="range-setter__input range-setter__input--mid"
+						@change=${e => callback({ min: e.target.value, max: e.target.value }, name)}
+						.value=${min !== max || isNaN(max) || isNaN(min) ? '' : max}
+						.placeholder=${name.toUpperCase()}
+					/>
+					<span class="range-setter__divider"> ≤ </span>
+					<input type="number"
+						class="range-setter__input range-setter__input--max"
+						@change=${e => callback({ min, max: e.target.value }, name)}
+						.value=${min === max || isNaN(max) ? '' : max}
+						placeholder="MAX"
+					/>
+				</span>
+			</div>
+			<button type="button"
+				class="search__fieldset__clear clear-search-field"
+				title="clear"
+				@click=${this.clearRange(name)}
+			>&times;
+			</button>
 		`
 	}
 
@@ -150,8 +156,7 @@ export default class Search extends Component {
 	updateFormat(e) {
 		const format = e.target.value.toLowerCase();
 		const filterFn = card => card.legalities[format] === 'Legal';
-		const any = card => true;
-		const byFormat = format === 'any' ? any : filterFn;
+		const byFormat = format === 'format' ? false : filterFn;
 		window.app.dispatch({ type: 'SET_CARD_FORMAT', payload: format, });
 		window.app.dispatch({ type: 'ADD_FILTER', payload: { byFormat }, })
 	}
@@ -205,6 +210,19 @@ export default class Search extends Component {
 		}
 	}
 
+	clearRange(field) {
+		return function(e) {
+			window.app.dispatch({
+				type: 'SET_CARD_' + field.toUpperCase(),
+				payload: { min: NaN, max: NaN },
+			});
+			window.app.dispatch({
+				type: 'REMOVE_FILTER',
+				payload: { ['by' + field]: false }
+			});
+		}
+	}
+
 	clearAll() {
 		window.app.dispatch({ type: 'RESTORE_SEARCH_DEFAULTS' });
 		window.app.dispatch({ type: 'RESTORE_FILTER_DEFAULTS' });
@@ -238,6 +256,11 @@ export default class Search extends Component {
 		e.stopPropagation();
 	}
 
+	setView(e) {
+		const mode = e.target.value.toLowerCase();
+		this.setState({ mode })
+	}
+
 	update(props, oldProps) {
 		const {
 				cardName,
@@ -253,10 +276,27 @@ export default class Search extends Component {
 				power,
 				toughness,
 		} = props.search;
+		const { mode } = this._state;
 
 		const view = html`
-			<form id="search" @submit=${this.search}>
-				<h2 class="search__header"> SEARCH </h2>
+			<form id="search" @submit=${this.search} class="view--${mode}">
+				<div class="search__header">
+					<span></span>
+					<h2 class="search__header__title"> SEARCH </h2>
+
+					<span class="search__options">
+						<label class="search__options__label" for="search__options">&#8942;</label>
+						<select id="search__options"
+							class="search__options__dropdown"
+							@change=${this.setView.bind(this)}
+						>
+							<option>Comfortable</option>
+							<option>Compact</option>
+							<option>Minimal</option>
+						</select>
+					</span>
+				</div>
+
 				${this.buildSearchInput({ ...this.optionsFor('Name'), value: cardName })}
 				<fieldset class="search__fieldset color-picker">
 					<legend>Color</legend>
@@ -285,13 +325,13 @@ export default class Search extends Component {
 								placeholder="Type"
 							>
 						</label>
-						<button type="button"
-							class="search__fieldset__clear clear-search-field"
-							title="clear"
-							@click=${this.clearCard('Type')}
-						>&times;
-						</button>
 					</div>
+					<button type="button"
+						class="search__fieldset__clear clear-search-field"
+						title="clear"
+						@click=${this.clearCard('Type')}
+					>&times;
+					</button>
 
 					<div class="expando search__fieldset__more-options">
 						<div class="expando-box">
@@ -316,23 +356,17 @@ export default class Search extends Component {
 				<fieldset class="search__fieldset">
 					<legend>CMC</legend>
 					<h3 class="search__fieldset__title">CMC</h3>
-					<div class="search__fieldset__group">
-						${this.buildRangeSetter({ name: 'cmc', min: cmc.min, max: cmc.max, callback: this.updateRangeField })}
-					</div>
+					${this.buildRangeSetter({ name: 'cmc', min: cmc.min, max: cmc.max, callback: this.updateRangeField })}
 				</fieldset>
 				<fieldset class="search__fieldset">
 					<legend>Power</legend>
 					<h3 class="search__fieldset__title">Power</h3>
-					<div class="search__fieldset__group">
-						${this.buildRangeSetter({ name: 'pwr', min: power.min, max: power.max, callback: this.updateRangeField })}
-					</div>
+					${this.buildRangeSetter({ name: 'pwr', min: power.min, max: power.max, callback: this.updateRangeField })}
 				</fieldset>
 				<fieldset class="search__fieldset">
 					<legend>Tough</legend>
 					<h3 class="search__fieldset__title">Tough</h3>
-					<div class="search__fieldset__group">
-						${this.buildRangeSetter({ name: 'tgh', min: toughness.min, max: toughness.max, callback: this.updateRangeField })}
-					</div>
+					${this.buildRangeSetter({ name: 'tgh', min: toughness.min, max: toughness.max, callback: this.updateRangeField })}
 				</fieldset>
 				<fieldset class="search__fieldset rarity-picker">
 					<legend>Rarity</legend>
@@ -357,7 +391,7 @@ export default class Search extends Component {
 					<div class="search__fieldset__group">
 						<label class="search__fieldset__label">
 							<select @change=${this.updateFormat}>
-								<option>Any</option>
+								<option>Format</option>
 								<option>1v1</option>
 								<option>Commander</option>
 								<option>Duel</option>
@@ -372,10 +406,15 @@ export default class Search extends Component {
 					</div>
 				</fieldset>
 				<fieldset>
-					<button type="button" @click=${this.clearAll}>Clear All</button>
+					<button class="search__clear-all"
+						type="button"
+						@click=${this.clearAll}
+					>Clear All</button>
 				</fieldset>
-				<fieldset class='search-fieldset mobile-only'>
-					<button>See Results</button>
+				<fieldset>
+					<button class="search__see-results"
+
+					>See Results</button>
 				</fieldset>
 			</form>
 		`;

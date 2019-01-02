@@ -76,35 +76,33 @@ export default class Nav extends Component {
             <li><a class="${search ? 'active' : ''}" @click=${this.toggleView('search')} class="nav-first">Search</a></li>
             <li><a class="${results ? 'active' : ''}" @click=${this.toggleView('results')}>Results</a></li>
             <li><a class="${deck ? 'active' : ''}" @click=${this.toggleView('deck')}>Deck</a></li>
-            <li>
-              <ul class="accordion"
-                @keyup="${e => e.key === 'Enter' && e.currentTarget.classList.toggle('open')}"
-                tabindex="0"
-              >
-                <li class="accordion__title"
-                  @click="${e => e.currentTarget.parentElement.classList.toggle('open')}"
-                >Preferences
-                  <span class="accordion__arrow">${svgIcon('chevron')}</span>
-                </li>
-                <li>
-                  <label>Menu Position:
-                    <select @change="${this.reposition.bind(this)}" style="background-color: #333; padding: 4px 0;">
-                      <option selected>Top Left</option>
-                      <option>Top Right</option>
-                      <option>Bottom Left</option>
-                      <option>Bottom Right</option>
-                    </select>
-                  </label>
-                </li>
-                <li class="theme-color-setter">
-                  <div>Theme Color</div>
-                  <div class="theme-color-setter-options">
-                    <input @change="${this.setThemeColor1.bind(this)}" type="color" value="#ffaa00" default="#ffaa00">
-                    <input @change="${this.setThemeColor2.bind(this)}" type="color" value="#800080" default="#800080">
-                    <input @change="${this.setThemeColor3.bind(this)}" type="color" value="#333333" default="#333333">
+            <li style="padding: 1em">
+              <div>Preferences</div>
+              <div class="expando">
+                <div class="expando-box">
+                  <div class="menu-position-setter">
+                    <label>Menu Position:
+                      <select @change="${this.reposition.bind(this)}" style="background-color: #333; padding: 4px 0;">
+                        <option selected>Top Left</option>
+                        <option>Top Right</option>
+                        <option>Bottom Left</option>
+                        <option>Bottom Right</option>
+                      </select>
+                    </label>
                   </div>
-                </li>
-              </ul>
+                  <div class="theme-color-setter">
+                    <div>Theme Color</div>
+                    <div class="theme-color-setter-options">
+                      <input @change="${this.setThemeColor1.bind(this)}" type="color" value="#ffaa00" default="#ffaa00">
+                      <input @change="${this.setThemeColor2.bind(this)}" type="color" value="#800080" default="#800080">
+                      <input @change="${this.setThemeColor3.bind(this)}" type="color" value="#333333" default="#333333">
+                    </div>
+                  </div>
+                </div>
+                <div class="expando-arrow" @click=${e => e.target.parentElement.classList.toggle('open')}>
+                  &#9660;
+                </div>
+              </div>
             </li>
             <li><span class="nav__menu__list-item nav__menu__list-item--spacer"> </span></li>
           </ul>
