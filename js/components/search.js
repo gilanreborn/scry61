@@ -176,10 +176,10 @@ export default class Search extends Component {
 
 	updateCardTextField(e) {
 		const text = e.target.value;
-		const byText = card => text.spit(' ').reduce((memo, term) => {
+		const byText = card => text.split(' ').reduce((memo, term) => {
 			return memo && card.text.toLowerCase().indexOf(term) !== -1;
 		}, true);
-		window.app.dispatch({ type: 'SET_CARD_TYPE', payload: text });
+		window.app.dispatch({ type: 'SET_CARD_TEXT', payload: text });
 		window.app.dispatch({ type: 'ADD_FILTER', payload: { byText }, });
 	}
 

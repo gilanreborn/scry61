@@ -1,12 +1,56 @@
 .results {
 	grid-area: results;
 	display: none;
+	padding: 0 1em;
 }
 
 .results.show {
 	display: block;
 }
 
+.results__header {
+	display: grid;
+	grid-template-areas: "left center right";
+	grid-template-columns: 1fr 8em 1fr;
+	font-family: Cinzel;
+	align-items: center;
+}
+
+.results__header__page-size-input {
+	border: none;
+	font-family: Cinzel;
+	width: 1.5em;
+	font-size: 1rem;
+	text-align: right;
+}
+
+.results__header__title {
+	text-align: center;
+}
+
+.results__header__pagination {
+	display: flex;
+	justify-content: flex-end;
+}
+
+.results__header__pagination__arrow {
+	all: unset;
+	padding: 0 .25em;
+	cursor: pointer;
+}
+.results__header__pagination__arrow:disabled {
+	cursor: not-allowed;
+	display: none;
+}
+.results__header__pagination__arrow:hover {
+	color: var(--highlight-color-1);
+}
+.results__header__pagination__arrow--right {
+	transform: scale(-1);
+}
+.results__header__pagination__text {
+	padding: 0 .25em;
+}
 
 .results__options {
 	font-family: Cinzel;
@@ -15,10 +59,18 @@
 .results__list {
 	display: flex;
 	flex-wrap: wrap;
+	overflow-y: scroll;
+	max-height: 85vh;
+	justify-content: center;
 }
 
 .results__list-item {
 	display: inline-block;
+}
+
+.results__no-results {
+	display: flex;
+	align-items: center;
 }
 
 .active {

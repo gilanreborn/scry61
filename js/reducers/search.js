@@ -34,6 +34,8 @@ export default function SearchReducer(state = initialState, action) {
 			return { ...state, cardSuperType: payload };
 		case 'SET_CARD_SUPERTYPE_OPTIONS':
 			return { ...state, cardSuperTypeOptions: payload };
+		case 'SET_CARD_TEXT':
+			return { ...state, cardText: payload };
 		case 'SET_CARD_CMC':
 			return { ...state, cmc: payload };
 		case 'SET_CARD_PWR':

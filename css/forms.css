@@ -22,6 +22,10 @@ select {
   height: 2rem;
 }
 
+select option {
+  color: black;
+}
+
 label {
   width: 100%;
 }
