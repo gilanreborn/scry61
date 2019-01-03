@@ -2,6 +2,7 @@ import Component from './component.js';
 import icon from '../templates/icon.js';
 import { html, svg, render } from 'https://unpkg.com/lit-html?module';
 import image from './card/image.js';
+import textBox from './card/textBox.js';
 
 export default class Results extends Component {
 	constructor(options) {
@@ -10,6 +11,7 @@ export default class Results extends Component {
 		this._state = {
 			sort: 'name',
 			sortDir: 'ASC',
+			mode: 'image',
 		};
 	}
 
@@ -80,18 +82,24 @@ export default class Results extends Component {
 
 	update(props, oldProps) {
 		const { imgSize, page, pageSize } = props.results;
-		const { sort, sortDir } = this._state;
+		const { sort, sortDir, mode } = this._state;
 		const results = window.cards ? this.applyFilters(props.filters) : [];
 		const sortedResults = results.length ? this.applySorts(results) : [];
 		const resultCountStart = Math.min(page * pageSize + 1, results.length);
 		const resultCountEnd = Math.min((page + 1) * pageSize, results.length);
 		const pageCountCurrent = page + 1;
 		const pageCountTotal = ~~(results.length / pageSize) + 1;
+
+		const modes = {
+			image: (card, printing) => image(card, printing),
+			text: (card, printing) => textBox(card, printing),
+		};
+
 		const resultsList = sortedResults.slice(page * pageSize, (page + 1) * pageSize).map(card => html`
-		<li class="results__list-item" style="width: ${imgSize}px">
-			${image(card, card.printings[card.printings.length - 1])}
-		</li>
-	`);
+			<li class="results__list-item" style="width: ${imgSize}px">
+				${modes['text'](card, card.printings[0])}
+			</li>
+		`);
 		const noResults = html`<li class="results__no-results">The specimen seems to be broken</li>`;
 
 		const view = html`

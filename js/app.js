@@ -52,8 +52,6 @@ export default class UI extends Component {
       const setName = set.name;
       cards.forEach(c => {
         AllCards[c.name] = AllCards[c.name] || c;
-        AllCards[c.name].sets = AllCards[c.name].sets || [];
-        AllCards[c.name].sets.push(code);
         // types
         AllCards[c.name].types = AllCards[c.name].types || [];
         // rarities
@@ -63,18 +61,17 @@ export default class UI extends Component {
           if (c.rarity === "Basic Land") { AllCards[c.name].rarities.push("Common"); } // treat basics as common
         }
         // formats & legality
-        AllCards[c.name].formats = AllCards[c.name].formats || {};
+        // AllCards[c.name].formats = AllCards[c.name].formats || {};
         // AllCards[c.name].formats = this.calculateFormats(c, type, releaseDate, AllCards[c.name].formats);
         // printings, artists, & flavor text
-        AllCards[c.name].printings = AllCards[c.name].printings || [];
-        AllCards[c.name].printings.push({
+        AllCards[c.name].sets = AllCards[c.name].sets || [];
+        AllCards[c.name].sets.push({
           set: code,
           setName: setName,
           artist: c.artist,
-          flavor: c.flavor,
-          mciSetCode: magicCardsInfoCode,
-          mciNumber: c.mciNumber || c.number,
-          multiverseId: c.multiverseid,
+          flavorText: c.flavorText,
+          mciNumber: c.number,
+          multiverseId: c.multiverseId,
           rarity: c.rarity,
         });
       });
@@ -104,5 +101,5 @@ window.addEventListener('load', function (e) {
   const view = new UI({ $container: q('#root')[0] });
   provider.subscribe([ view ]);
 
-  app.update(app.state)
+  app.update(app.state);
 });
