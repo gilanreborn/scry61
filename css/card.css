@@ -1,4 +1,49 @@
-.card__text .icon {
-	height: 1rem;
-	width: 1rem;
+.card {
+	font-size: 1rem;
+}
+
+.card-view--text {
+	padding: 1rem;
+}
+
+.card__title-box {
+	display: flex;
+	justify-content: space-between;
+	padding: .5em 0;
+	font-weight: bold;
+	font-size: 1.1em;
+}
+
+.card__types {
+	display: flex;
+	justify-content: space-between;
+}
+
+.card .icon {
+	height: 1em;
+	width: 1em;
+}
+
+.card__text p {
+	padding: .5em 0;
+}
+
+.card__text__flavor {
+	font-style: italic;
+}
+
+.card__stats {
+	display: flex;
+	justify-content: flex-end;
+	font-size: 1.1em;
+}
+
+@media screen and ( max-width: 480px ) {
+	.card {
+		font-size: 1em;
+	}
+
+	.card-view--text {
+		min-width: 100%;
+	}
 }

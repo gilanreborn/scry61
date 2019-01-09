@@ -2,7 +2,9 @@ import Component from './component.js';
 import icon from '../templates/icon.js';
 import { html, svg, render } from 'https://unpkg.com/lit-html?module';
 import image from './card/image.js';
-import textBox from './card/textBox.js';
+import text from './card/text.js';
+import expando from './expando.js';
+import pagination from './pagination.js';
 
 export default class Results extends Component {
 	constructor(options) {
@@ -11,7 +13,6 @@ export default class Results extends Component {
 		this._state = {
 			sort: 'name',
 			sortDir: 'ASC',
-			mode: 'image',
 		};
 	}
 
@@ -21,6 +22,9 @@ export default class Results extends Component {
 	setSortDir(value) {
 		return e => this.setState({ sortDir: value });
 	}
+	changeSort(e) {
+		this.setState({ sort: e.target.value })
+	}
 
 	increaseImgSize(e) {
 		window.app.dispatch({ type: 'INCREASE_IMG_SIZE', });
@@ -28,6 +32,10 @@ export default class Results extends Component {
 
 	decreaseImgSize(e) {
 		window.app.dispatch({ type: 'DECREASE_IMG_SIZE', });
+	}
+
+	setCardView(value) {
+		return e => window.app.dispatch({ type: 'SET_CARD_VIEW', payload: value });
 	}
 
 	applyFilters(filters = {}) {
@@ -57,9 +65,11 @@ export default class Results extends Component {
 		return results;
 	}
 
-	buildSortInput({ text, value, active }) {
+	buildSortInput({ text, value, active, type }) {
 		return html`
-			<a class="${active ? 'active' : ''}" @click=${this.setSort(value).bind(this)}>
+			<a class="${active ? 'active' : ''}"
+				@click=${type === 'sort' ? this.setSort(value).bind(this) : this.setSortDir(value).bind(this)}
+			>
 				${text}
 			</a>
 		`;
@@ -81,8 +91,8 @@ export default class Results extends Component {
 	}
 
 	update(props, oldProps) {
-		const { imgSize, page, pageSize } = props.results;
-		const { sort, sortDir, mode } = this._state;
+		const { imgSize, page, pageSize, cardView } = props.results;
+		const { sort, sortDir } = this._state;
 		const results = window.cards ? this.applyFilters(props.filters) : [];
 		const sortedResults = results.length ? this.applySorts(results) : [];
 		const resultCountStart = Math.min(page * pageSize + 1, results.length);
@@ -92,12 +102,12 @@ export default class Results extends Component {
 
 		const modes = {
 			image: (card, printing) => image(card, printing),
-			text: (card, printing) => textBox(card, printing),
+			text: (card, printing) => text(card, printing),
 		};
 
 		const resultsList = sortedResults.slice(page * pageSize, (page + 1) * pageSize).map(card => html`
-			<li class="results__list-item" style="width: ${imgSize}px">
-				${modes['text'](card, card.printings[0])}
+			<li class="results__list-item card__container card-view--${cardView}" style="width: ${imgSize}px">
+				${modes[cardView](card, card.printings[0])}
 			</li>
 		`);
 		const noResults = html`<li class="results__no-results">The specimen seems to be broken</li>`;
@@ -119,50 +129,47 @@ export default class Results extends Component {
 					</div>
 					<h2 class="results__header__title">Results</h2>
 					<div class="results__header__pagination">
-						<button class="results__header__pagination__arrow results__header__pagination__arrow--left non-selectable"
-							@click=${this.updatePage.bind(this)}
-							value="-3"
-							?disabled=${page === 0}
-						>◄◄</button>
-						<button class="results__header__pagination__arrow results__header__pagination__arrow--left non-selectable"
-							@click=${this.updatePage.bind(this)}
-							value="-1"
-							?disabled=${page === 0}
-						>◄</button>
-						<span class="results__header__pagination__text">
-							Page ${pageCountCurrent} of ${pageCountTotal}
-						</span>
-						<button class="results__header__pagination__arrow results__header__pagination__arrow--right non-selectable"
-							@click=${this.updatePage.bind(this)}
-							value="1"
-							?disabled=${pageCountCurrent >= pageCountTotal}
-						>◄</button>
-						<button class="results__header__pagination__arrow results__header__pagination__arrow--right non-selectable"
-							@click=${this.updatePage.bind(this)}
-							value="3"
-							?disabled=${pageCountCurrent + 2 >= pageCountTotal}
-						>◄◄</button>
+						${pagination({ page, pageCountCurrent, pageCountTotal, callback: this.updatePage.bind(this) })}
 					</div>
 				</div>
-				<div class="results__options">
-					Sort:
-						${this.buildSortInputs([
-							{ text: 'Name', value: 'name', active: sort === 'name' },
-							{ text: 'Power', value: 'power', active: sort === 'power' },
-							{ text: 'Toughness', value: 'toughness', active: sort === 'toughness' },
-							{ text: 'CMC', value: 'convertedManaCost', active: sort === 'convertedManaCost' },
-						])}
-					|
-						${this.buildSortInputs([
-							{ text: 'ASC', value: 'ASC', active: sortDir === 'ASC' },
-							{ text: 'DES', value: 'DES', active: sortDir === 'DES' },
-						])}
-
-					View:
-						<a @click=${this.increaseImgSize}>+</a>
-						<a @click=${this.decreaseImgSize}>–</a>
-				</div>
-				<ul class="results__list">
+				${expando({ contents: html`
+					<div class="results__options non-selectable">
+						${pagination({ page, pageCountCurrent, pageCountTotal, callback: this.updatePage.bind(this) })}
+						<fieldset class="results__fieldset results__options__sorts">
+							<h3 class="results__fieldset__title">Sort:</h3>
+							<div class="results__options__sorts__dropdown">
+								<select @change=${this.changeSort.bind(this)}>
+									<option value="name">Name</option>
+									<option value="power">Power</option>
+									<option value="toughness">Toughness</option>
+									<option value="convertedManaCost">CMC</option>
+									<option value="loyalty">Loyalty</option>
+								</select>
+							</div>
+						</fieldset>
+						<span class="results__options__spacer"> | </span>
+						<fieldset class="results__fieldset results__options__dirs">
+							<h3 class="results__fieldset__title">Dir:</h3>
+							${this.buildSortInputs([
+								{ text: 'ASC', value: 'ASC', active: sortDir === 'ASC' },
+								{ text: 'DES', value: 'DES', active: sortDir === 'DES' },
+							])}
+						</fieldset>
+						<span class="results__options__spacer"> | </span>
+						<fieldset class="results__fieldset results__options__views">
+							<h3 class="results__fieldset__title">View:</h3>
+								<a class="${cardView === 'text' ? 'active' : ''}"
+									@click=${this.setCardView('text').bind(this)}
+								>Text</a>
+								<a class="${cardView === 'image' ? 'active' : ''}"
+									@click=${this.setCardView('image').bind(this)}
+								>Img</a>
+								<a @click=${this.increaseImgSize}>+</a>
+								<a @click=${this.decreaseImgSize}>–</a>
+							</fieldset>
+					</div>`
+				})}
+				<ul class="results__list" style="font-size: ${imgSize / 12}px">
 					${resultsList.length ? resultsList : noResults}
 				</ul>
 			</div>

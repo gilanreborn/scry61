@@ -1,4 +1,4 @@
-const isMobile = window.matchMedia('(max-width: 767px)').matches;
+const isMobile = () => window.matchMedia('(max-width: 767px)').matches;
 
 const defaultState = {
 	themeColors: {
@@ -12,8 +12,8 @@ const defaultState = {
 	},
 	show: {
 		search: true,
-		results: !isMobile,
-		deck: !isMobile,
+		results: !isMobile(),
+		deck: !isMobile(),
 	},
 };
 
@@ -29,7 +29,7 @@ export default function PreferencesReducer(state = initialState, action) {
 			const navPos = { ...state.navPos, ...payload };
 			return { ...state, ...navPos };
 		case 'TOGGLE_PANE':
-			if ( isMobile ) {
+			if ( isMobile() ) {
 				return {
 					...state,
 					show: { search: false, results: false, deck: false, [payload]: true },

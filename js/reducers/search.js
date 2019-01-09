@@ -14,7 +14,6 @@ const defaultState = {
 	toughness: {min: NaN, max: NaN},
 };
 
-
 const initialState = defaultState;
 
 export default function SearchReducer(state = initialState, action) {

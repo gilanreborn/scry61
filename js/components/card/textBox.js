@@ -7,8 +7,8 @@ export default function textBox(card, printing) {
 		return text.split('\n').map(block => {
 			const blocks = block.split(/{|}/g).map((t, i) => {
 				return i % 2 ? icon(t) : html`<span>${t}</span>`;
-			})
-			return [...blocks, html`<br/>`];
+			});
+			return html`<p>${blocks}</p>`;
 		});
   }
 
@@ -21,7 +21,12 @@ export default function textBox(card, printing) {
       case 'Special':     return 'mediumpurple';;
       default: return 'black';
     }
-  }
+	}
+
+	const stats = card.power !== undefined || card.toughness !== undefined
+		? html`<span>${card.power} / ${card.toughness}</span>`
+		: card.loyalty !== undefined ? html`<span>${card.loyalty}</span>`
+		: '';
 
 	return html`
 		<div class="card__text-box">
@@ -37,9 +42,8 @@ export default function textBox(card, printing) {
 				<p class="card__text__main">${formatText(card.text)}</p>
 				<blockquote class="card__text__flavor">${card.flavorText}</blockquote>
 			</div>
-			<div class="card__pt">
-				<span>${card.power} / ${card.toughness}</span>
-				<span>${card.loyalty}</span>
+			<div class="card__stats">
+				${stats}
 			</div>
 		</div>
 	`;
