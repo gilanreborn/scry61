@@ -42,6 +42,7 @@ export default class Search extends Component {
 
 	buildPicker(values, currentValue, updateCallback) {
 		const options = values.map(({ value, symbol }) => {
+			console.log('checked:', currentValue.includes(value));
 			return { checked: currentValue.includes(value), click: updateCallback.bind(this), symbol, value };
 		});
 		return options.map(opt => html`<li>${this.buildCheckbox(opt)}</li>`);
@@ -49,7 +50,7 @@ export default class Search extends Component {
 
 	buildCheckbox({ checked, click, symbol, value, title }) {
 		return html`
-			<input type="checkbox" id="${symbol}" name="${symbol}" ?checked=${checked} @click=${click} symbol=${symbol} value=${value}>
+			<input type="checkbox" id="${symbol}" name="${symbol}" .checked=${checked} @click=${click} symbol=${symbol} value=${value}>
 			<label class="checkbox__label" for="${symbol}" title="${title || value}">${icon(symbol)}</label>
 		`
 	}
@@ -64,7 +65,7 @@ export default class Search extends Component {
 						id="${id}"
 						class="search-refiner__radio__button"
 						name="radio-group--${type}"
-						?checked=${currentRefinement === opt}
+						.checked=${currentRefinement === opt}
 						@click=${click}
 						value=${opt}
 					>
@@ -123,6 +124,10 @@ export default class Search extends Component {
 			clear: self.clearCard(fieldName),
 			placeholder: fieldName,
 		}
+	}
+
+	seeResults(e) {
+		window.app.dispatch({ type: 'TOGGLE_PANE', payload: 'results' })
 	}
 
 	// UPDATER FUNCTIONS
@@ -413,7 +418,8 @@ export default class Search extends Component {
 				</fieldset>
 				<fieldset>
 					<button class="search__see-results"
-
+						type="button"
+						@click=${this.seeResults}
 					>See Results</button>
 				</fieldset>
 			</form>

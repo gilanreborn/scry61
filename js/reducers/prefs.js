@@ -30,6 +30,7 @@ export default function PreferencesReducer(state = initialState, action) {
 			return { ...state, ...navPos };
 		case 'TOGGLE_PANE':
 			if ( isMobile() ) {
+				debugger;
 				return {
 					...state,
 					show: { search: false, results: false, deck: false, [payload]: true },

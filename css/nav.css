@@ -3,6 +3,9 @@
 header {
   grid-column: span 3;
   grid-area: head;
+  overflow: hidden;
+  max-height: 200px;
+  transition: all .5s ease-in-out;
 }
 
 .nav {
@@ -136,6 +139,10 @@ nav a:focus {
   text-align: right;
 }
 
+.preferences__form {
+  padding: .5em 0;
+}
+
 .theme-color-setter {
   flex-direction: column;
 }
@@ -143,3 +150,18 @@ nav a:focus {
 .theme-color-setter-options {
   display: flex;
 }
+
+.logo-hider ul {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.logo-hider__radio__button + .logo-hider__radio__label {
+  border: none;
+}
+
+.logo-hider__radio__button:checked + .logo-hider__radio__label {
+  font-weight: bold;
+  text-decoration: underline;
+}
+

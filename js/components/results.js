@@ -68,6 +68,7 @@ export default class Results extends Component {
 	buildSortInput({ text, value, active, type }) {
 		return html`
 			<a class="${active ? 'active' : ''}"
+				tabindex="0"
 				@click=${type === 'sort' ? this.setSort(value).bind(this) : this.setSortDir(value).bind(this)}
 			>
 				${text}
@@ -129,12 +130,13 @@ export default class Results extends Component {
 					</div>
 					<h2 class="results__header__title">Results</h2>
 					<div class="results__header__pagination">
-						${pagination({ page, pageCountCurrent, pageCountTotal, callback: this.updatePage.bind(this) })}
+						${pagination({ page, pageCountCurrent, pageCountTotal, callback: this.updatePage.bind(this), klass: 'head' })}
 					</div>
 				</div>
-				${expando({ contents: html`
+				${expando({
+					klass: 'results__options__container',
+					contents: html`
 					<div class="results__options non-selectable">
-						${pagination({ page, pageCountCurrent, pageCountTotal, callback: this.updatePage.bind(this) })}
 						<fieldset class="results__fieldset results__options__sorts">
 							<h3 class="results__fieldset__title">Sort:</h3>
 							<div class="results__options__sorts__dropdown">
@@ -172,6 +174,11 @@ export default class Results extends Component {
 				<ul class="results__list" style="font-size: ${imgSize / 12}px">
 					${resultsList.length ? resultsList : noResults}
 				</ul>
+				<div class="results__footer">
+					<div class="results__footer__pagination">
+					${pagination({ page, pageCountCurrent, pageCountTotal, callback: this.updatePage.bind(this), klass: 'footer' })}
+					</div>
+				</div>
 			</div>
 		`;
 		render(view, this.$container);

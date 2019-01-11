@@ -35,6 +35,11 @@ export default class Nav extends Component {
   toggleMenu(e) {
     this.setState({ open: !this._state.open });
   }
+  toggleLogoView(e) {
+    e.target.value === 'show'
+      ? q('header')[0].style.setProperty('max-height', '200px')
+      : q('header')[0].style.setProperty('max-height', 0);
+  }
 
   maybeToggleMenu(e) {
     e.key === "Enter" && this.toggleMenu(e);
@@ -80,22 +85,56 @@ export default class Nav extends Component {
               <div>Preferences</div>
               <div class="expando">
                 <div class="expando-box">
-                  <div class="menu-position-setter">
-                    <label>Menu Position:
-                      <select @change="${this.reposition.bind(this)}" style="background-color: #333; padding: 4px 0;">
-                        <option selected>Top Left</option>
-                        <option>Top Right</option>
-                        <option>Bottom Left</option>
-                        <option>Bottom Right</option>
-                      </select>
-                    </label>
-                  </div>
-                  <div class="theme-color-setter">
-                    <div>Theme Color</div>
-                    <div class="theme-color-setter-options">
-                      <input @change="${this.setThemeColor1.bind(this)}" type="color" value="#ffaa00" default="#ffaa00">
-                      <input @change="${this.setThemeColor2.bind(this)}" type="color" value="#800080" default="#800080">
-                      <input @change="${this.setThemeColor3.bind(this)}" type="color" value="#333333" default="#333333">
+                  <div class="preferences__form">
+                    <div class="menu-position-setter">
+                      <label>Menu Position:
+                        <select @change="${this.reposition.bind(this)}" style="background-color: #333; padding: 4px 0;">
+                          <option selected>Top Left</option>
+                          <option>Top Right</option>
+                          <option>Bottom Left</option>
+                          <option>Bottom Right</option>
+                        </select>
+                      </label>
+                    </div>
+                    <div class="theme-color-setter">
+                      <div>Theme Color</div>
+                      <div class="theme-color-setter-options">
+                        <input @change="${this.setThemeColor1.bind(this)}" type="color" value="#ffaa00" default="#ffaa00">
+                        <input @change="${this.setThemeColor2.bind(this)}" type="color" value="#800080" default="#800080">
+                        <input @change="${this.setThemeColor3.bind(this)}" type="color" value="#333333" default="#333333">
+                      </div>
+                    </div>
+                    <div class="logo-hider">
+                      <div>Logo</div>
+                      <ul>
+                        <li>
+                          <input type="radio"
+                            id="logo-hider--show"
+                            class="logo-hider__radio__button"
+                            name="radio-group--logo-hider"
+                            @click=${this.toggleLogoView}
+                            value="show"
+                            checked="true"
+                          >
+                          <label class="logo-hider__radio__label"
+                            for="logo-hider--show"
+                            title="Show"
+                          >Show</label>
+                        </li>
+                        <li>
+                          <input type="radio"
+                            id="logo-hider--hide"
+                            class="logo-hider__radio__button"
+                            name="radio-group--logo-hider"
+                            @click=${this.toggleLogoView}
+                            value="hide"
+                          >
+                          <label class="logo-hider__radio__label"
+                            for="logo-hider--hide"
+                            title="Hide"
+                          >Hide</label>
+                        </li>
+                      </ul>
                     </div>
                   </div>
                 </div>

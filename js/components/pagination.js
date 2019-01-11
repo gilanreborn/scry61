@@ -1,9 +1,8 @@
 import { html } from 'https://unpkg.com/lit-html?module';
 
-export default function pagination({ page, pageCountCurrent, pageCountTotal, callback }) {
+export default function pagination({ page, pageCountCurrent, pageCountTotal, callback, klass }) {
 	return html`
-		<div class="results__fieldset pagination__container">
-			<h3 class="results__fieldset__title pagination__title--outer">Page:</h3>
+		<div class="pagination__container pagination__container--${klass}">
 			<button class="pagination__arrow pagination__arrow--left non-selectable"
 				@click=${callback}
 				value="-3"
