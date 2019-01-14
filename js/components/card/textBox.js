@@ -2,7 +2,7 @@ import { html, svg, render } from 'https://unpkg.com/lit-html?module';
 import icon from '../../templates/icon.js';
 
 
-export default function textBox(card, printing) {
+export default function textBox({ card, printing }) {
   const formatText = (text = '') => {
 		return text.split('\n').map(block => {
 			const blocks = block.split(/{|}/g).map((t, i) => {

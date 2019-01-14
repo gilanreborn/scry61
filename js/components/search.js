@@ -42,7 +42,6 @@ export default class Search extends Component {
 
 	buildPicker(values, currentValue, updateCallback) {
 		const options = values.map(({ value, symbol }) => {
-			console.log('checked:', currentValue.includes(value));
 			return { checked: currentValue.includes(value), click: updateCallback.bind(this), symbol, value };
 		});
 		return options.map(opt => html`<li>${this.buildCheckbox(opt)}</li>`);

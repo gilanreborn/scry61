@@ -2,6 +2,7 @@
 
 export default class Component {
   constructor(options = {}) {
+    Object.assign(this, options);
     this.$container = options.$container || document;
     this._state = options._state || {};
     // this._children = [];

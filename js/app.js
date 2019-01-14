@@ -7,6 +7,7 @@ import Nav from './components/nav.js';
 import Accordion from './components/accordion.js';
 import Results from './components/results.js';
 import Search from './components/search.js';
+import Deck from './components/deck.js';
 
 window.q = q;
 
@@ -15,19 +16,37 @@ export default class UI extends Component {
     super(options);
 
     this.bindChildren();
+    this.bindGlobalEventListeners();
     this.fetchCardInfo();
   }
 
   bindChildren() {
+    const dragNDrop = {
+      handleDragOver: this.handleDragOver,
+      handleDrop: this.handleDrop,
+    };
     const nav = new Nav({ $container: q('.header')[0], });
     const search = new Search({ $container: q('.search')[0] });
-    const results = new Results({ $container: q('.results')[0] });
-    const accordions = q('.accordion').map($container => new Accordion({ $container }));
+    const results = new Results({
+      $container: q('.results')[0],
+      ...dragNDrop,
+    });
+    const deck = new Deck({
+      $container: q('.deck')[0],
+      ...dragNDrop,
+    });
     this.children = [
       nav,
       search,
       results,
+      deck,
     ];
+  }
+
+  bindGlobalEventListeners() {
+    this.on('dragover', '.droppable', this.handleDragOver);
+    this.on('dragend', 'main', this.handleDrop);
+    this.on('drop', '.droppable', this.handleDrop);
   }
 
   fetchCardInfo() {
@@ -79,13 +98,31 @@ export default class UI extends Component {
     return AllCards;
   }
 
-  update(props, prevProps) {
+  handleDragOver(e) {
+		e.preventDefault();
+	}
+
+	handleDrop(e) {
+		e.preventDefault();
+		q('body')[0].classList.remove('dragging');
+		var cardName = e.dataTransfer.getData("text/plain");
+    if (!cardName) { return false; }
+    const card = window.cards.filter(c => c.name === cardName)[0];
+    debugger;
+    if (!card) { return false; }
+    window.app.dispatch({
+			type: 'ADD_CARD_TO_MAIN',
+			payload: card,
+		});
+	}
+
+  update(props, oldProps) {
     const { $container } = this;
     const { search, results, deck } = props.preferences.show;
     q('section.search')[0].classList.toggle('show', search);
     q('section.results')[0].classList.toggle('show', results);
     q('section.deck')[0].classList.toggle('show', deck);
-    this.children.map(child => child.update(props, prevProps));
+    this.children.map(child => child.update(props, oldProps));
   }
 }
 
@@ -100,6 +137,16 @@ window.addEventListener('load', function (e) {
   var provider = window.app = createStore(rootReducer);
   const view = new UI({ $container: q('#root')[0] });
   provider.subscribe([ view ]);
+
+  // document.addEventListener("dragend", function(e) {
+  //   debugger;
+  // }, false);
+
+  // document.addEventListener("drop", function( event ) {
+  //   // prevent default action (open as link for some elements)
+  //   event.preventDefault();
+  //   // move dragged elem to the selected drop target
+  // }, false);
 
   app.update(app.state);
 });

@@ -102,8 +102,8 @@ export default class Results extends Component {
 		const pageCountTotal = ~~(results.length / pageSize) + 1;
 
 		const modes = {
-			image: (card, printing) => image(card, printing),
-			text: (card, printing) => text(card, printing),
+			image: (card, printing) => image({ card, printing }),
+			text: (card, printing) => text({ card, printing }),
 		};
 
 		const resultsList = sortedResults.slice(page * pageSize, (page + 1) * pageSize).map(card => html`
@@ -117,7 +117,7 @@ export default class Results extends Component {
 			<div id="results">
 				<div class="results__header">
 					<div class="results__header__count">
-						<span>Results ${resultCountStart} - ${resultCountEnd} of ${results.length}</span>
+						<span>${resultCountStart} - ${resultCountEnd} of ${results.length}</span>
 						<span> | </span>
 						<span>
 							<input type="number"
@@ -179,6 +179,14 @@ export default class Results extends Component {
 					${pagination({ page, pageCountCurrent, pageCountTotal, callback: this.updatePage.bind(this), klass: 'footer' })}
 					</div>
 				</div>
+			</div>
+			<div class="deck__peeker"
+				@dragover=${this.handleDragOver}
+				@dragend=${this.handleDrop}
+				@drop=${this.handleDrop}
+			>
+				<div>MAIN</div>
+				<div>SIDE</div>
 			</div>
 		`;
 		render(view, this.$container);

@@ -58,6 +58,10 @@ img {
   flex-direction: column;
 }
 
+.collapsed + * {
+  display: none;
+}
+
 .non-selectable {
   -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */

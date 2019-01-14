@@ -14,6 +14,10 @@
 	font-size: 1.1em;
 }
 
+.card__title-box.collapsed + .card__text-box {
+	display: none;
+}
+
 .card__types {
 	display: flex;
 	justify-content: space-between;
