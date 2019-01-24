@@ -4,7 +4,7 @@ import titleBox from './titleBox.js';
 
 export default function text({ card, printing, collapsed }) {
 	return html`
-		<article class="card"
+		<article class="card draggable"
 			?draggable="true"
 		>
 			${titleBox({ card, printing, collapsed })}

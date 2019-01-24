@@ -8,7 +8,7 @@ export default function image({ card, printing }) {
 		e.dataTransfer.dropEffect = 'copy';
 	};
 	return html`
-		<img class="card__image"
+		<img class="card__image draggable"
 			src="${sourcePath}"
 			alt="${card.name}"
 			title="${card.name}"

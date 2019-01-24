@@ -107,9 +107,10 @@ export default class UI extends Component {
 		q('body')[0].classList.remove('dragging');
 		var cardName = e.dataTransfer.getData("text/plain");
     if (!cardName) { return false; }
+
     const card = window.cards.filter(c => c.name === cardName)[0];
-    debugger;
     if (!card) { return false; }
+
     window.app.dispatch({
 			type: 'ADD_CARD_TO_MAIN',
 			payload: card,
