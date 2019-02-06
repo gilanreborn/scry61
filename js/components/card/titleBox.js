@@ -10,10 +10,17 @@ export default function titleBox({ card, printing, collapsed = false }) {
 			return html`<span>${blocks}</span>`;
 		});
 	}
+	const handleDrag = e => {
+		q('body')[0].classList.add('dragging');
+		e.dataTransfer.setData('text/plain', card.name);
+		e.dataTransfer.dropEffect = 'copy';
+	};
 
 	return html`
 		<div class="card__title-box ${collapsed ? 'collapsed' : ''}"
 			@click=${e => e.currentTarget.classList.toggle('collapsed')}
+			@dragstart=${handleDrag}
+			?draggable="true"
 		>
 			<span class="card__name">
 				${card.name}

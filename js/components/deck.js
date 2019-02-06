@@ -29,7 +29,7 @@ export default class Deck extends Component {
 			})
 		});
 
-		return deck;
+		return deck || {};
 	}
 
 	buildCardList({ cards, location }) {
@@ -62,8 +62,8 @@ export default class Deck extends Component {
 
 	buildDeckList({ deckObj }) {
 		const deckList = Object.keys(deckObj).sort().map(cardType => {
-      const cards = deckObj[cardType];
-      if ( !cards.length ) { return }; // no cards of the given type
+			const cards = deckObj[cardType];
+			if ( !cards.length ) { return }; // no cards of the given type
 			return html`
 				<li class="deck__list__category flex--col">
 					<span class="deck__list__category__title"
@@ -99,7 +99,9 @@ export default class Deck extends Component {
 	update(props, oldProps) {
 		const { main, side } = props.deck;
 		const deckObj = this.buildDeckObj(main);
+		const sideObj = this.buildDeckObj(side);
 		const mainList = this.buildDeckList({ deckObj });
+		const sideList = this.buildDeckList({ deckObj: sideObj });
 		// const sideList = this.buildCardList(side, 'side');
 		const view = html`
 			<div class="deck__header">
@@ -107,19 +109,27 @@ export default class Deck extends Component {
 			</div>
 			<div class="deck__options">
 			</div>
-			<div class="deck__list flex--col"
-				@dragover=${this.handleDragOver}
-				@dragend=${this.handleDrop}
-				@drop=${this.handleDrop}
-			>
-				<span
-					@click=${e => e.currentTarget.classList.toggle('collapsed')}
-				><strong>MAIN</strong> <span>(${main.length && main.length})</span></span>
-				<ul class="deck__list__main">
-					${mainList}
-				</ul>
-				<ul class="deck__list__side">
-				</ul>
+			<div class="deck__list flex--col">
+				<div class="deck__list--main droppable"
+					data-drop-target="main"
+				>
+					<span @click=${e => e.currentTarget.classList.toggle('collapsed')}>
+						<strong>MAIN</strong> <span>(${main.length && main.length})</span>
+					</span>
+					<ul class="deck__list__main">
+						${mainList}
+					</ul>
+				</div>
+				<div class="deck__list--side droppable"
+					data-drop-target="side"
+				>
+					<span @click=${e => e.currentTarget.classList.toggle('collapsed')}>
+						<strong>SIDE</strong> <span>(${side.length && side.length})</span>
+					</span>
+					<ul class="deck__list__side">
+						${sideList}
+					</ul>
+				</div>
 			</div>
 			<div class="deck__footer"></div>
 		`;

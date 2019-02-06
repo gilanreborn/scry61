@@ -12,142 +12,173 @@ import Deck from './components/deck.js';
 window.q = q;
 
 export default class UI extends Component {
-  constructor(options) {
-    super(options);
+	constructor(options) {
+		super(options);
 
-    this.bindChildren();
-    this.bindGlobalEventListeners();
-    this.fetchCardInfo();
-  }
+		this.bindChildren();
+		this.bindGlobalEventListeners();
+		this.fetchCardInfo();
+	}
 
-  bindChildren() {
-    const dragNDrop = {
-      handleDragOver: this.handleDragOver,
-      handleDrop: this.handleDrop,
-    };
-    const nav = new Nav({ $container: q('.header')[0], });
-    const search = new Search({ $container: q('.search')[0] });
-    const results = new Results({
-      $container: q('.results')[0],
-      ...dragNDrop,
-    });
-    const deck = new Deck({
-      $container: q('.deck')[0],
-      ...dragNDrop,
-    });
-    this.children = [
-      nav,
-      search,
-      results,
-      deck,
-    ];
-  }
+	bindChildren() {
+		const dragNDrop = {
+			handleDragOver: this.handleDragOver,
+			handleDrop: this.handleDrop,
+		};
+		const nav = new Nav({ $container: q('.header')[0], });
+		const search = new Search({ $container: q('.search')[0] });
+		const results = new Results({
+			$container: q('.results')[0],
+			...dragNDrop,
+		});
+		const deck = new Deck({
+			$container: q('.deck')[0],
+			...dragNDrop,
+		});
+		this.children = [
+			nav,
+			search,
+			results,
+			deck,
+		];
+	}
 
-  bindGlobalEventListeners() {
-    this.on('dragover', '.droppable', this.handleDragOver);
-    this.on('dragend', 'main', this.handleDrop);
-    this.on('drop', '.droppable', this.handleDrop);
-  }
+	bindGlobalEventListeners() {
+		document.addEventListener('dragover', this.handleDragOver);
+		document.addEventListener('dragleave', this.handleDragLeave);
+		document.addEventListener('dragend', this.handleDrop);
+		// this.on('dragend', 'main', this.handleDrop);
+		this.on('dragstart', '.draggable', this.handleDragStart);
+		this.on('drop', '.droppable', this.handleDrop);
+	}
 
-  fetchCardInfo() {
-    const self = this;
-    fetchAllSets().then(AllSets => {
-      const AllCards = self.buildAllCards(AllSets);
-      const dummy = { name: '', type: '', text: '', colors: [], convertedManaCost: 0, rarities: [], };
-      const cards = Object.values(AllCards)
-        .filter(c => c.name)
-        .map(c => Object.assign({}, dummy, c));
-      window.cards = cards;
-      window.app.dispatch({
-        type: 'CARD_FETCH_SUCCESS',
-      });
-    });
-  }
+	fetchCardInfo() {
+		const self = this;
+		fetchAllSets().then(AllSets => {
+			const AllCards = self.buildAllCards(AllSets);
+			const dummy = { name: '', type: '', text: '', colors: [], convertedManaCost: 0, rarities: [], };
+			const cards = Object.values(AllCards)
+				.filter(c => c.name)
+				.map(c => Object.assign({}, dummy, c));
+			window.cards = cards;
+			window.app.dispatch({
+				type: 'CARD_FETCH_SUCCESS',
+			});
+		});
+	}
 
-  buildAllCards(AllSets) {
-    let AllCards = {};
-    Object.values(AllSets).forEach(set => {
-      const { code, cards, type, releaseDate, magicCardsInfoCode } = set;
-      const setName = set.name;
-      cards.forEach(c => {
-        AllCards[c.name] = AllCards[c.name] || c;
-        // types
-        AllCards[c.name].types = AllCards[c.name].types || [];
-        // rarities
-        AllCards[c.name].rarities = AllCards[c.name].rarities || [];
-        if (type === 'core' || type === 'expansion') {
-          AllCards[c.name].rarities.push(c.rarity); // only include rarity values from format-legal sets.
-          if (c.rarity === "Basic Land") { AllCards[c.name].rarities.push("Common"); } // treat basics as common
-        }
-        // formats & legality
-        // AllCards[c.name].formats = AllCards[c.name].formats || {};
-        // AllCards[c.name].formats = this.calculateFormats(c, type, releaseDate, AllCards[c.name].formats);
-        // printings, artists, & flavor text
-        AllCards[c.name].sets = AllCards[c.name].sets || [];
-        AllCards[c.name].sets.push({
-          set: code,
-          setName: setName,
-          artist: c.artist,
-          flavorText: c.flavorText,
-          mciNumber: c.number,
-          multiverseId: c.multiverseId,
-          rarity: c.rarity,
-        });
-      });
-    });
-    return AllCards;
-  }
+	buildAllCards(AllSets) {
+		let AllCards = {};
+		Object.values(AllSets).forEach(set => {
+			const { code, cards, type, releaseDate, magicCardsInfoCode } = set;
+			const setName = set.name;
+			cards.forEach(c => {
+				AllCards[c.name] = AllCards[c.name] || c;
+				// types
+				AllCards[c.name].types = AllCards[c.name].types || [];
+				// rarities
+				AllCards[c.name].rarities = AllCards[c.name].rarities || [];
+				if (type === 'core' || type === 'expansion') {
+					AllCards[c.name].rarities.push(c.rarity); // only include rarity values from format-legal sets.
+					if (c.rarity === "Basic Land") { AllCards[c.name].rarities.push("Common"); } // treat basics as common
+				}
+				// formats & legality
+				// AllCards[c.name].formats = AllCards[c.name].formats || {};
+				// AllCards[c.name].formats = this.calculateFormats(c, type, releaseDate, AllCards[c.name].formats);
+				// printings, artists, & flavor text
+				AllCards[c.name].sets = AllCards[c.name].sets || [];
+				AllCards[c.name].sets.push({
+					set: code,
+					setName: setName,
+					artist: c.artist,
+					flavorText: c.flavorText,
+					mciNumber: c.number,
+					multiverseId: c.multiverseId,
+					rarity: c.rarity,
+				});
+			});
+		});
+		return AllCards;
+	}
 
-  handleDragOver(e) {
+	handleDragStart(e) {
+		q('body')[0].classList.add('dragging');
+		const cardName = e.delegateTarget.getAttribute('title');
+		e.dataTransfer.setData('text/plain', cardName);
+		e.dataTransfer.dropEffect = 'copy';
+	}
+
+	handleDragOver(e) {
 		e.preventDefault();
+		[...e.path].map(el => {
+			if (el.classList && el.classList.contains('droppable')) {
+				el.classList.add('drag-hover');
+			}
+		});
+	}
+
+	handleDragLeave(e) {
+		e.preventDefault();
+		e.target.classList.remove('drag-hover');
 	}
 
 	handleDrop(e) {
 		e.preventDefault();
 		q('body')[0].classList.remove('dragging');
+		q('.droppable').map(el => el.classList.remove('drag-hover'));
+
 		var cardName = e.dataTransfer.getData("text/plain");
-    if (!cardName) { return false; }
+		if (!cardName) { return false; }
 
-    const card = window.cards.filter(c => c.name === cardName)[0];
-    if (!card) { return false; }
+		const card = window.cards.filter(c => c.name === cardName)[0];
+		if (!card) { return false; }
 
-    window.app.dispatch({
-			type: 'ADD_CARD_TO_MAIN',
-			payload: card,
-		});
+		const dropType = e.delegateTarget.dataset.dropTarget || 'none';
+
+		switch (dropType) {
+			case 'main':
+				app.dispatch({ type: 'ADD_CARD_TO_MAIN', payload: card });
+				break;
+			case 'side':
+				app.dispatch({ type: 'ADD_CARD_TO_SIDE', payload: card });
+				break;
+			case 'remove':
+				app.dispatch({ type: 'REMOVE_CARD_FROM', payload: card });
+				break;
+		}
 	}
 
-  update(props, oldProps) {
-    const { $container } = this;
-    const { search, results, deck } = props.preferences.show;
-    q('section.search')[0].classList.toggle('show', search);
-    q('section.results')[0].classList.toggle('show', results);
-    q('section.deck')[0].classList.toggle('show', deck);
-    this.children.map(child => child.update(props, oldProps));
-  }
+	update(props, oldProps) {
+		const { $container } = this;
+		const { search, results, deck } = props.preferences.show;
+		q('section.search')[0].classList.toggle('show', search);
+		q('section.results')[0].classList.toggle('show', results);
+		q('section.deck')[0].classList.toggle('show', deck);
+		this.children.map(child => child.update(props, oldProps));
+	}
 }
 
 window.addEventListener('load', function (e) {
-  if (false && 'serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').then(
-      registration => console.log('SW registration successful; scope: ', registration.scope),
-      err => console.log('ServiceWorker registration failed: ', err)
-    );
-  }
+	if (false && 'serviceWorker' in navigator) {
+		navigator.serviceWorker.register('/sw.js').then(
+			registration => console.log('SW registration successful; scope: ', registration.scope),
+			err => console.log('ServiceWorker registration failed: ', err)
+		);
+	}
 
-  var provider = window.app = createStore(rootReducer);
-  const view = new UI({ $container: q('#root')[0] });
-  provider.subscribe([ view ]);
+	var provider = window.app = createStore(rootReducer);
+	const view = new UI({ $container: q('#root')[0] });
+	provider.subscribe([ view ]);
 
-  // document.addEventListener("dragend", function(e) {
-  //   debugger;
-  // }, false);
+	// document.addEventListener("dragend", function(e) {
+	//   debugger;
+	// }, false);
 
-  // document.addEventListener("drop", function( event ) {
-  //   // prevent default action (open as link for some elements)
-  //   event.preventDefault();
-  //   // move dragged elem to the selected drop target
-  // }, false);
+	// document.addEventListener("drop", function( event ) {
+	//   // prevent default action (open as link for some elements)
+	//   event.preventDefault();
+	//   // move dragged elem to the selected drop target
+	// }, false);
 
-  app.update(app.state);
+	app.update(app.state);
 });

@@ -1,0 +1,7 @@
+.draggable:hover {
+  cursor: pointer;
+}
+
+.dragging .droppable.drag-hover {
+	background: var(--theme-color-2);
+}
