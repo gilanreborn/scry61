@@ -114,7 +114,7 @@ export default class Results extends Component {
 		const noResults = html`<li class="results__no-results">The specimen seems to be broken</li>`;
 
 		const view = html`
-			<div id="results">
+			<div id="results" data-drop-target="results">
 				<div class="results__header">
 					<div class="results__header__count">
 						<span>${resultCountStart} - ${resultCountEnd} of ${results.length}</span>

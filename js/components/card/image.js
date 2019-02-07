@@ -4,7 +4,10 @@ export default function image({ card, printing }) {
 	let sourcePath = `https://api.scryfall.com/cards/named?fuzzy=${card.name.split(' ').join('+')}&format=image`;
 	const handleDrag = e => {
 		q('body')[0].classList.add('dragging');
-		e.dataTransfer.setData('text/plain', card.name);
+		const source = e.target.closest('[data-drop-target]').dataset.dropTarget || 'results';
+		const name = card.name;
+		const data = JSON.stringify({ name, source });
+		e.dataTransfer.setData('text/plain', data);
 		e.dataTransfer.dropEffect = 'copy';
 	};
 	return html`

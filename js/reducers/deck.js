@@ -12,11 +12,13 @@ export default function DeckReducer(state = initialState, action) {
 		case 'ADD_CARD_TO_MAIN':
 			return { ...state, main: [...state.main, payload] };
 		case 'REMOVE_CARD_FROM_MAIN':
-			return { ...state, main: state.main.filter(c => c !== payload) };
+			var i = state.main.indexOf(payload);
+			return { ...state, main: state.main.filter((_, idx) => idx !== i) };
 		case 'ADD_CARD_TO_SIDE':
 			return { ...state, side: [...state.side, payload] };
 		case 'REMOVE_CARD_FROM_SIDE':
-			return { ...state, side: state.side.filter(c => c !== payload) };
+			var i = state.side.indexOf(payload);
+			return { ...state, side: state.side.filter((_, idx) => idx !== i) };
 		case 'RESTORE_DECK_DEFAULTS':
 			// window.localStorage.clear();
 			return defaultState;

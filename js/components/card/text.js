@@ -5,10 +5,11 @@ import titleBox from './titleBox.js';
 export default function text({ card, printing, collapsed }) {
 	const handleDrag = e => {
 		q('body')[0].classList.add('dragging');
-		e.dataTransfer.setData('text/plain', card.name);
-		// e.dataTransfer.setDragImage(img, 0, 0);
+		const source = e.target.closest('[data-drop-target]').dataset.dropTarget || 'results';
+		const name = card.name;
+		const data = JSON.stringify({ name, source });
+		e.dataTransfer.setData('text/plain', data);
 		e.dataTransfer.dropEffect = 'copy';
-		console.log(e);
 	};
 	return html`
 		<article class="card non-selectable draggable"

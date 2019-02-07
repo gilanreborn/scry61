@@ -48,7 +48,6 @@ export default class UI extends Component {
 		document.addEventListener('dragleave', this.handleDragLeave);
 		document.addEventListener('dragend', this.handleDrop);
 		// this.on('dragend', 'main', this.handleDrop);
-		this.on('dragstart', '.draggable', this.handleDragStart);
 		this.on('drop', '.droppable', this.handleDrop);
 	}
 
@@ -103,8 +102,10 @@ export default class UI extends Component {
 
 	handleDragStart(e) {
 		q('body')[0].classList.add('dragging');
-		const cardName = e.delegateTarget.getAttribute('title');
-		e.dataTransfer.setData('text/plain', cardName);
+		const from = e.target.closest('.droppable') || 'results';
+		const name = e.delegateTarget.getAttribute('title');
+		const data = JSON.stringify({ name, from });
+		e.dataTransfer.setData('text/plain', data);
 		e.dataTransfer.dropEffect = 'copy';
 	}
 
@@ -127,23 +128,36 @@ export default class UI extends Component {
 		q('body')[0].classList.remove('dragging');
 		q('.droppable').map(el => el.classList.remove('drag-hover'));
 
-		var cardName = e.dataTransfer.getData("text/plain");
-		if (!cardName) { return false; }
+		var data = e.dataTransfer.getData("text/plain");
+		const { name, source } = JSON.parse(data);
+		if (!name) { return false; }
 
-		const card = window.cards.filter(c => c.name === cardName)[0];
+		const card = window.cards.filter(c => c.name === name)[0];
 		if (!card) { return false; }
 
-		const dropType = e.delegateTarget.dataset.dropTarget || 'none';
-
-		switch (dropType) {
-			case 'main':
+		const target = e.delegateTarget.dataset.dropTarget || 'remove';
+		switch (`${source} --> ${target}`) {
+			case 'results --> main':
 				app.dispatch({ type: 'ADD_CARD_TO_MAIN', payload: card });
 				break;
-			case 'side':
+			case 'results --> side':
 				app.dispatch({ type: 'ADD_CARD_TO_SIDE', payload: card });
 				break;
-			case 'remove':
-				app.dispatch({ type: 'REMOVE_CARD_FROM', payload: card });
+			case 'main --> remove':
+				app.dispatch({ type: 'REMOVE_CARD_FROM_MAIN', payload: card });
+				break;
+			case 'main --> side':
+				app.dispatch({ type: 'REMOVE_CARD_FROM_MAIN', payload: card });
+				app.dispatch({ type: 'ADD_CARD_TO_SIDE', payload: card });
+				break;
+			case 'side --> remove':
+				app.dispatch({ type: 'REMOVE_CARD_FROM_SIDE', payload: card });
+				break;
+			case 'side --> main':
+				app.dispatch({ type: 'REMOVE_CARD_FROM_SIDE', payload: card });
+				app.dispatch({ type: 'ADD_CARD_TO_MAIN', payload: card });
+				break;
+			default:
 				break;
 		}
 	}
