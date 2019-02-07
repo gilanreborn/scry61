@@ -46,8 +46,9 @@ export default class UI extends Component {
 	bindGlobalEventListeners() {
 		document.addEventListener('dragover', this.handleDragOver);
 		document.addEventListener('dragleave', this.handleDragLeave);
-		document.addEventListener('dragend', this.handleDrop);
+		document.addEventListener('dragend', this.handleDragEnd);
 		// this.on('dragend', 'main', this.handleDrop);
+		this.on('dragstart', '.draggable', this.handleDragStart);
 		this.on('drop', '.droppable', this.handleDrop);
 	}
 
@@ -102,9 +103,9 @@ export default class UI extends Component {
 
 	handleDragStart(e) {
 		q('body')[0].classList.add('dragging');
-		const from = e.target.closest('.droppable') || 'results';
+		const source = e.target.closest('[data-drop-target]').dataset.dropTarget || 'results';
 		const name = e.delegateTarget.getAttribute('title');
-		const data = JSON.stringify({ name, from });
+		const data = JSON.stringify({ name, source });
 		e.dataTransfer.setData('text/plain', data);
 		e.dataTransfer.dropEffect = 'copy';
 	}
@@ -123,6 +124,12 @@ export default class UI extends Component {
 		e.target.classList.remove('drag-hover');
 	}
 
+	handleDragEnd(e) {
+		e.preventDefault();
+		q('body')[0].classList.remove('dragging');
+		q('.droppable').map(el => el.classList.remove('drag-hover'));
+	}
+
 	handleDrop(e) {
 		e.preventDefault();
 		q('body')[0].classList.remove('dragging');
@@ -130,10 +137,9 @@ export default class UI extends Component {
 
 		var data = e.dataTransfer.getData("text/plain");
 		const { name, source } = JSON.parse(data);
-		if (!name) { return false; }
-
+		// if (!name) { return false; }
 		const card = window.cards.filter(c => c.name === name)[0];
-		if (!card) { return false; }
+		// if (!card) { return false; }
 
 		const target = e.delegateTarget.dataset.dropTarget || 'remove';
 		switch (`${source} --> ${target}`) {
