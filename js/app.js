@@ -8,6 +8,7 @@ import Accordion from './components/accordion.js';
 import Results from './components/results.js';
 import Search from './components/search.js';
 import Deck from './components/deck.js';
+import Modal from './components/modal.js';
 
 window.q = q;
 
@@ -25,11 +26,13 @@ export default class UI extends Component {
 		const search = new Search({ $container: q('.search')[0] });
 		const results = new Results({ $container: q('.results')[0] });
 		const deck = new Deck({ $container: q('.deck')[0] });
+		const modal = new Modal({ $container: q('#modal')[0] });
 		this.children = [
 			nav,
 			search,
 			results,
 			deck,
+			modal,
 		];
 	}
 

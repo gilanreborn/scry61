@@ -81,34 +81,89 @@ export default class Deck extends Component {
 		return deckList;
 	}
 
-	handleDragOver(e) {
-		e.preventDefault();
-	}
-
-	handleDrop(ev) {
-		ev.preventDefault();
-		q('body')[0].classList.remove('dragging');
-		var cardName = ev.dataTransfer.getData("text/plain");
-		const card = window.cards.filter(c => c.name === cardName)[0];
-		window.app.dispatch({
-			type: 'ADD_CARD_TO_MAIN',
-			payload: card,
+	setDeckTitle(e) {
+		const payload = e.target.value;
+		app.dispatch({
+			type: 'SET_DECK_TITLE',
+			payload,
 		});
 	}
 
+	newDeck(e) {
+		app.dispatch({ type: 'MAKE_NEW_DECK' });
+	}
+
+	saveDeck(e) {
+		const { deck } = app.state;
+		const Scry61 = window.localStorage;
+
+		if (deck.title) {
+			const Scry61 = window.localStorage;
+			Scry61.setItem(deck.id, JSON.stringify(deck));
+		} else {
+			alert('Please name your deck.');
+		}
+	}
+
+	loadDeck(e) {
+		const Scry61 = window.localStorage;
+		const deckIds = Object.keys(Scry61);
+		const decks = deckIds.map(k => JSON.parse(Scry61[k]));
+		app.dispatch({
+			type: 'SET_MODAL_CONTENT',
+			payload: {
+				content: decks.map(deck => html`
+					<li class="deck__import__li"
+						@click="${this.importDeck}"
+						data-title="${deck.title}"
+						data-id="${deck.id}"
+					>
+						${deck.title}
+					</li>
+				`),
+				title: 'Load A Deck',
+			},
+		});
+		app.dispatch({ type: 'SHOW_MODAL' });
+	}
+
+	importDeck(e) {
+		const deckId = e.target.dataset.id;
+		const json = window.localStorage[deckId];
+		const deck = JSON.parse(json);
+
+		app.dispatch({
+			type: 'IMPORT_DECKLIST',
+			payload: deck,
+		});
+
+		app.dispatch({ type: 'HIDE_MODAL' });
+	}
+
 	update(props, oldProps) {
-		const { main, side } = props.deck;
+		const { main, side, title } = props.deck;
 		const deckObj = this.buildDeckObj(main);
 		const sideObj = this.buildDeckObj(side);
 		const mainList = this.buildDeckList({ deckObj });
 		const sideList = this.buildDeckList({ deckObj: sideObj });
-		// const sideList = this.buildCardList(side, 'side');
+
 		const view = html`
 			<div class="deck__header">
 				<h2 class="deck__header__title">Deck</h2>
 			</div>
-			<div class="deck__options">
-			</div>
+			${expando({
+					klass: 'deck__header__options',
+					contents: html`
+					<div class="deck__options">
+						<input @change="${this.setDeckTitle.bind(this)}" type="text" value="${title}" default="untitled" placeholder="Deck Title">
+						<div class="deck__options__save flex">
+							<a @click="${this.newDeck.bind(this)}">New</a>
+							<a @click="${this.saveDeck.bind(this)}">Save</a>
+							<a @click="${this.loadDeck.bind(this)}">Load</a>
+						</div>
+					</div>
+					`,
+				})}
 			<div class="deck__list flex--col">
 				<div class="deck__list--main droppable"
 					data-drop-target="main"

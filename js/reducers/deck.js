@@ -1,4 +1,7 @@
+const id = Date.now();
+
 const defaultState = {
+	id,
 	title: '',
 	main: [],
 	side: [],
@@ -22,6 +25,12 @@ export default function DeckReducer(state = initialState, action) {
 		case 'RESTORE_DECK_DEFAULTS':
 			// window.localStorage.clear();
 			return defaultState;
+		case 'SET_DECK_TITLE':
+			return { ...state, title: payload };
+		case 'IMPORT_DECKLIST':
+			return payload;
+		case 'MAKE_NEW_DECK':
+			return { ...defaultState, id: Date.now() };
 		default:
 			return state;
 	}

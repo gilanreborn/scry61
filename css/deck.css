@@ -19,6 +19,19 @@
 	justify-content: center;
 }
 
+.deck__options {
+	padding: 1em;
+	font-family: Cinzel;
+}
+
+.deck__options__save {
+	justify-content: space-around;
+}
+
+.deck__options a {
+	padding: .25em;
+}
+
 .deck__list {
 	min-height: 500px;
 }
@@ -78,4 +91,13 @@
 
 .deck__list--main, .deck__list--side {
 	padding-bottom: 1em;
+}
+
+.deck__import__li {
+	padding: .5em;
+	cursor: pointer;
+}
+
+.deck__import__li:hover {
+	text-decoration: underline;
 }
