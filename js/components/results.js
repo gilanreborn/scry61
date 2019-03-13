@@ -180,11 +180,6 @@ export default class Results extends Component {
 					</div>
 				</div>
 			</div>
-			<div class="deck__peeker">
-				<div class="deck__peeker-item droppable" data-drop-target="main">MAIN</div>
-				<div class="deck__peeker-item droppable" data-drop-target="side">SIDE</div>
-				<div class="deck__peeker-item droppable" data-drop-target="remove">REMOVE</div>
-			</div>
 		`;
 		render(view, this.$container);
 	}

@@ -5,3 +5,11 @@
 .dragging .droppable.drag-hover {
 	background: var(--theme-color-2);
 }
+
+.draggable {
+  background: var(--theme-color-3);
+}
+
+.draggable .draggable:focus {
+  border: 1px solid var(--theme-color-1)
+}

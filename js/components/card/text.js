@@ -3,7 +3,6 @@ import textBox from './textBox.js';
 import titleBox from './titleBox.js';
 
 export default function text({ card, printing, collapsed }) {
-
 	return html`
 		<article class="card non-selectable draggable"
 			draggable="true"
@@ -12,5 +11,5 @@ export default function text({ card, printing, collapsed }) {
 			${titleBox({ card, printing, collapsed })}
 			${textBox({ card, printing })}
 		</article>
-	`
+	`;
 }

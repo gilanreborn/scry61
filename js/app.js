@@ -21,20 +21,10 @@ export default class UI extends Component {
 	}
 
 	bindChildren() {
-		const dragNDrop = {
-			handleDragOver: this.handleDragOver,
-			handleDrop: this.handleDrop,
-		};
 		const nav = new Nav({ $container: q('.header')[0], });
 		const search = new Search({ $container: q('.search')[0] });
-		const results = new Results({
-			$container: q('.results')[0],
-			...dragNDrop,
-		});
-		const deck = new Deck({
-			$container: q('.deck')[0],
-			...dragNDrop,
-		});
+		const results = new Results({ $container: q('.results')[0] });
+		const deck = new Deck({ $container: q('.deck')[0] });
 		this.children = [
 			nav,
 			search,
@@ -112,16 +102,15 @@ export default class UI extends Component {
 
 	handleDragOver(e) {
 		e.preventDefault();
-		[...e.path].map(el => {
-			if (el.classList && el.classList.contains('droppable')) {
-				el.classList.add('drag-hover');
-			}
-		});
+		// q('.droppable').map(el => el.classList.remove('drag-hover'));
+		if (e.target.classList && e.target.classList.contains('droppable')) {
+			e.target.classList.add('drag-hover');
+		}
 	}
 
 	handleDragLeave(e) {
 		e.preventDefault();
-		e.target.classList.remove('drag-hover');
+		e.target.classList && e.target.classList.remove('drag-hover');
 	}
 
 	handleDragEnd(e) {
