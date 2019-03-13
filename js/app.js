@@ -92,8 +92,14 @@ export default class UI extends Component {
 	}
 
 	handleDragStart(e) {
+		const { imgSize, cardView } = window.app.state.results;
 		q('body')[0].classList.add('dragging');
-		e.target.style.backgroundColor = 'var(--theme-color-3)';
+		// set the drag image:
+		var crt = e.target.cloneNode(true);
+		crt.style.backgroundColor = 'var(--theme-color-3)';
+		crt.style.width = imgSize + 'px';
+		q('#hidden-drag-bucket')[0].appendChild(crt);
+		e.dataTransfer.setDragImage(crt, 0, 0);
 		const source = e.target.closest('[data-drop-target]').dataset.dropTarget || 'results';
 		const name = e.delegateTarget.getAttribute('title');
 		const data = JSON.stringify({ name, source });
@@ -118,7 +124,8 @@ export default class UI extends Component {
 
 	handleDragEnd(e) {
 		e.preventDefault();
-		e.target.style.backgroundColor = '';
+		const dragBucket = q('#hidden-drag-bucket')[0];
+		while (dragBucket.firstChild) { dragBucket.removeChild(dragBucket.firstChild) }
 		q('body')[0].classList.remove('dragging');
 		q('.droppable').map(el => el.classList.remove('drag-hover'));
 	}

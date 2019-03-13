@@ -9,3 +9,15 @@
 .draggable .draggable:focus {
   border: 1px solid var(--theme-color-1)
 }
+
+#hidden-drag-bucket {
+  position: fixed;
+  bottom: -99999px;
+}
+
+#hidden-drag-bucket > * {
+  max-height: 100%;
+  max-width: 100%;
+  height: auto;
+  background-color: var(--theme-color-3);
+}
