@@ -93,6 +93,7 @@ export default class UI extends Component {
 
 	handleDragStart(e) {
 		q('body')[0].classList.add('dragging');
+		e.target.style.backgroundColor = 'var(--theme-color-3)';
 		const source = e.target.closest('[data-drop-target]').dataset.dropTarget || 'results';
 		const name = e.delegateTarget.getAttribute('title');
 		const data = JSON.stringify({ name, source });
@@ -103,9 +104,11 @@ export default class UI extends Component {
 	handleDragOver(e) {
 		e.preventDefault();
 		// q('.droppable').map(el => el.classList.remove('drag-hover'));
-		if (e.target.classList && e.target.classList.contains('droppable')) {
-			e.target.classList.add('drag-hover');
-		}
+		e.composedPath().map(el => {
+			if (el.classList && el.classList.contains('droppable')) {
+				el.classList.add('drag-hover');
+			}
+		});
 	}
 
 	handleDragLeave(e) {
@@ -115,6 +118,7 @@ export default class UI extends Component {
 
 	handleDragEnd(e) {
 		e.preventDefault();
+		e.target.style.backgroundColor = '';
 		q('body')[0].classList.remove('dragging');
 		q('.droppable').map(el => el.classList.remove('drag-hover'));
 	}
