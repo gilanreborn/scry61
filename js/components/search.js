@@ -49,7 +49,7 @@ export default class Search extends Component {
 
 	buildCheckbox({ checked, click, symbol, value, title }) {
 		return html`
-			<input type="checkbox" id="${symbol}" name="${symbol}" .checked=${checked} @click=${click} symbol=${symbol} value=${value}>
+			<input type="checkbox" id="${symbol}" name="${symbol}" ?checked=${checked} @click=${click} symbol=${symbol} value=${value}>
 			<label class="checkbox__label" for="${symbol}" title="${title || value}">${icon(symbol)}</label>
 		`
 	}
@@ -233,7 +233,6 @@ export default class Search extends Component {
 	}
 
 	abstractedFilterOptions(filterTarget, filterValue, filterOption) {
-		console.log([ filterTarget, filterValue, filterOption ]);
     const filterFuncs = {
       'AND': card => filterValue.reduce((memo, target) => memo && card[filterTarget].includes(target), true),
       'OR': card => filterValue.reduce((memo, target) => memo || card[filterTarget].includes(target), false),

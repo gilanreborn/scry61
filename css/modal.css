@@ -6,8 +6,9 @@
   background: var(--theme-color-3);
   padding: 1em;
   max-width: 90vw;
-  min-width: 50vw;
-  max-height: 66vh;
+  min-width: 300px;
+  min-height: 400px;
+  max-height: 80vh;
   z-index: 2;
 }
 
@@ -35,5 +36,11 @@
 
 .modal__close {
   cursor: pointer;
+  font-size: 1.5rem;
+  line-height: 1rem;
+}
+
+.modal__close:hover {
+  color: var(--highlight-color-1);
 }
 

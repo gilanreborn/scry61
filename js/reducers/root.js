@@ -5,6 +5,7 @@ import filters from './filters.js';
 import preferences from './prefs.js';
 import deck from './deck.js';
 import modal from './modal.js';
+import inspector from './inspector.js';
 
 export const rootReducer = combineReducers({
 	search,
@@ -13,4 +14,5 @@ export const rootReducer = combineReducers({
 	filters,
 	preferences,
 	modal,
+	inspector,
 });

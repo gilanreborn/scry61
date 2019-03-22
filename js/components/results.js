@@ -171,7 +171,7 @@ export default class Results extends Component {
 							</fieldset>
 					</div>`
 				})}
-				<ul class="results__list" style="font-size: ${imgSize / 12}px">
+				<ul class="results__list scrollable" style="font-size: ${imgSize / 12}px">
 					${resultsList.length ? resultsList : noResults}
 				</ul>
 				<div class="results__footer">

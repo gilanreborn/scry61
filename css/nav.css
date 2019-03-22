@@ -6,6 +6,7 @@ header {
   overflow: hidden;
   max-height: 200px;
   transition: all .5s ease-in-out;
+  height: 54px;
 }
 
 .nav {

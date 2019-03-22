@@ -1,5 +1,6 @@
 .expando {
 	overflow: hidden;
+	flex-shrink: 0;
 }
 
 .expando .expando-box {

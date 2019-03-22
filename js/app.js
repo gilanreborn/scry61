@@ -9,6 +9,7 @@ import Results from './components/results.js';
 import Search from './components/search.js';
 import Deck from './components/deck.js';
 import Modal from './components/modal.js';
+import Inspector from './components/inspector.js'
 
 window.q = q;
 
@@ -27,22 +28,33 @@ export default class UI extends Component {
 		const results = new Results({ $container: q('.results')[0] });
 		const deck = new Deck({ $container: q('.deck')[0] });
 		const modal = new Modal({ $container: q('#modal')[0] });
+		const inspector = new Inspector({ $container: q('#inspector')[0] });
 		this.children = [
 			nav,
 			search,
 			results,
 			deck,
 			modal,
+			inspector,
 		];
 	}
 
 	bindGlobalEventListeners() {
-		document.addEventListener('dragover', this.handleDragOver);
-		document.addEventListener('dragleave', this.handleDragLeave);
-		document.addEventListener('dragend', this.handleDragEnd);
+		document.addEventListener('dragover', this.handleDragOver.bind(this));
+		document.addEventListener('dragleave', this.handleDragLeave.bind(this));
+		document.addEventListener('dragend', this.handleDragEnd.bind(this));
 		// this.on('dragend', 'main', this.handleDrop);
-		this.on('dragstart', '.draggable', this.handleDragStart);
-		this.on('drop', '.droppable', this.handleDrop);
+		this.on('dragstart', '.draggable', this.handleDragStart.bind(this));
+		this.on('drop', '.droppable', this.handleDrop.bind(this));
+		document.addEventListener('touchstart', this.handleTouchStart.bind(this));
+		document.addEventListener('touchmove', this.handleTouchMove.bind(this));
+		document.addEventListener('touchend', this.handleTouchEnd.bind(this));
+		document.addEventListener('touchcancel', this.emptyDragBucket.bind(this));
+	}
+
+	emptyDragBucket() {
+		const dragBucket = q('#hidden-drag-bucket')[0];
+		while (dragBucket.firstChild) { dragBucket.removeChild(dragBucket.firstChild) }
 	}
 
 	fetchCardInfo() {
@@ -75,10 +87,6 @@ export default class UI extends Component {
 					AllCards[c.name].rarities.push(c.rarity); // only include rarity values from format-legal sets.
 					if (c.rarity === "Basic Land") { AllCards[c.name].rarities.push("Common"); } // treat basics as common
 				}
-				// formats & legality
-				// AllCards[c.name].formats = AllCards[c.name].formats || {};
-				// AllCards[c.name].formats = this.calculateFormats(c, type, releaseDate, AllCards[c.name].formats);
-				// printings, artists, & flavor text
 				AllCards[c.name].sets = AllCards[c.name].sets || [];
 				AllCards[c.name].sets.push({
 					set: code,
@@ -98,11 +106,11 @@ export default class UI extends Component {
 		const { imgSize, cardView } = window.app.state.results;
 		q('body')[0].classList.add('dragging');
 		// set the drag image:
-		var crt = e.target.cloneNode(true);
-		crt.style.backgroundColor = 'var(--theme-color-3)';
-		crt.style.width = imgSize + 'px';
-		q('#hidden-drag-bucket')[0].appendChild(crt);
-		e.dataTransfer.setDragImage(crt, 0, 0);
+		var dragImage = e.target.cloneNode(true);
+		dragImage.style.backgroundColor = 'var(--theme-color-3)';
+		dragImage.style.width = imgSize + 'px';
+		q('#hidden-drag-bucket')[0].appendChild(dragImage);
+		e.dataTransfer.setDragImage(dragImage, 0, 0);
 		const source = e.target.closest('[data-drop-target]').dataset.dropTarget || 'results';
 		const name = e.delegateTarget.getAttribute('title');
 		const data = JSON.stringify({ name, source });
@@ -112,7 +120,6 @@ export default class UI extends Component {
 
 	handleDragOver(e) {
 		e.preventDefault();
-		// q('.droppable').map(el => el.classList.remove('drag-hover'));
 		e.composedPath().map(el => {
 			if (el.classList && el.classList.contains('droppable')) {
 				el.classList.add('drag-hover');
@@ -127,8 +134,7 @@ export default class UI extends Component {
 
 	handleDragEnd(e) {
 		e.preventDefault();
-		const dragBucket = q('#hidden-drag-bucket')[0];
-		while (dragBucket.firstChild) { dragBucket.removeChild(dragBucket.firstChild) }
+		this.emptyDragBucket();
 		q('body')[0].classList.remove('dragging');
 		q('.droppable').map(el => el.classList.remove('drag-hover'));
 	}
@@ -140,11 +146,66 @@ export default class UI extends Component {
 
 		var data = e.dataTransfer.getData("text/plain");
 		const { name, source } = JSON.parse(data);
-		// if (!name) { return false; }
 		const card = window.cards.filter(c => c.name === name)[0];
-		// if (!card) { return false; }
 
 		const target = e.delegateTarget.dataset.dropTarget || 'remove';
+		this.move(card, source, target);
+	}
+
+	handleTouchStart(e) {
+		const dragItem = e.target.closest('.draggable');
+		if (e.targetTouches.length == 1 && dragItem) {
+			// We're dragging
+			const { imgSize, cardView } = window.app.state.results;
+			q('body')[0].classList.add('dragging');
+			window.dragSource = dragItem;
+			var dragImage = dragItem.cloneNode(true);
+			dragImage.style.backgroundColor = 'var(--theme-color-3)';
+			dragImage.style.width = imgSize + 'px';
+			dragImage.style.position = 'fixed';
+			dragImage.style.left = e.targetTouches[0].pageX + 'px';
+			dragImage.style.top = e.targetTouches[0].pageY + 'px';
+			dragImage.style.opacity = 0.5;
+			dragImage.style.zIndex = '11';
+			q('#hidden-drag-bucket')[0].appendChild(dragImage);
+		}
+	}
+
+	handleTouchMove(e) {
+		console.log('touchmove', new Date());
+		const dragImage = q('#hidden-drag-bucket')[0].firstChild;
+		if (e.targetTouches.length == 1 && dragImage) {
+			const dragX = e.targetTouches[0].pageX;
+			const dragY = e.targetTouches[0].pageY;
+			dragImage.style.left = dragX + 'px';
+			dragImage.style.top = dragY + 'px';
+			dragImage.style.pointerEvents = 'none'; // ignore the dragImage when getting elementFromPoint
+			const hoveredElement = document.elementFromPoint(dragX, dragY);
+			const dropTarget = hoveredElement.closest('.droppable');
+			q('.droppable').map(el => el.classList.remove('drag-hover'));
+			dropTarget && dropTarget.classList.add('drag-hover');
+		}
+	}
+
+	handleTouchEnd(e) {
+		const x = e.changedTouches[0].clientX;
+		const y = e.changedTouches[0].clientY;
+		const hoveredElement = document.elementFromPoint(x, y);
+		const dropTarget = hoveredElement && hoveredElement.closest('.droppable');
+		if ( dropTarget && window.dragSource ) {
+			const cardName = window.dragSource.getAttribute('title');
+			const card = window.cards.filter(c => c.name === cardName)[0];
+			const source = window.dragSource.closest('[data-drop-target]').dataset.dropTarget || 'results';
+			const target = dropTarget.dataset.dropTarget;
+			this.move(card, source, target);
+		}
+		this.emptyDragBucket();
+		q('body')[0].classList.remove('dragging');
+		q('.droppable').map(el => el.classList.remove('drag-hover'));
+		window.dragSource = null;
+	}
+
+	move(card, source, target) {
 		switch (`${source} --> ${target}`) {
 			case 'results --> main':
 				app.dispatch({ type: 'ADD_CARD_TO_MAIN', payload: card });
@@ -166,6 +227,21 @@ export default class UI extends Component {
 				app.dispatch({ type: 'REMOVE_CARD_FROM_SIDE', payload: card });
 				app.dispatch({ type: 'ADD_CARD_TO_MAIN', payload: card });
 				break;
+			default:
+				break;
+		}
+		switch (target) {
+			case 'inspect':
+				app.dispatch({ type: 'INSPECT_CARD', payload: card });
+				app.dispatch({
+					type: 'SET_MODAL_CONTENT',
+					payload: {
+						content: q('#inspector')[0],
+						title: card.name,
+					},
+				});
+				app.dispatch({ type: 'SHOW_MODAL' });
+			break;
 			default:
 				break;
 		}
@@ -192,16 +268,6 @@ window.addEventListener('load', function (e) {
 	var provider = window.app = createStore(rootReducer);
 	const view = new UI({ $container: q('#root')[0] });
 	provider.subscribe([ view ]);
-
-	// document.addEventListener("dragend", function(e) {
-	//   debugger;
-	// }, false);
-
-	// document.addEventListener("drop", function( event ) {
-	//   // prevent default action (open as link for some elements)
-	//   event.preventDefault();
-	//   // move dragged elem to the selected drop target
-	// }, false);
 
 	app.update(app.state);
 });

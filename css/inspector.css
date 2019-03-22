@@ -1,0 +1,44 @@
+.inspector {
+  flex-wrap: wrap;
+}
+
+.inspector__options {
+  flex-basis: 50%;
+  flex-grow: 1;
+  flex-shrink: 0;
+  padding: 1em;
+  font-family: Cinzel;
+}
+
+.inspector__card {
+  flex-basis: 50%;
+  flex-grow: 1;
+  flex-shrink: 0;
+  padding: 1em;
+}
+
+.inspector__form--compact legend {
+	display: none;
+}
+.inspector__form--comfortable .inspector__fieldset__title {
+	display: none;
+}
+
+.inspector__form--minimal legend,
+.inspector__form--minimal .inspector__fieldset__title {
+	display: none;
+}
+
+.inspector__radio__label {
+	border: none;
+	padding: .25em;
+}
+
+.inspector__radio__button + .inspector__radio__label {
+	border: none;
+}
+
+.inspector__radio__button:checked + .inspector__radio__label {
+	text-decoration: underline;
+	font-weight: bold;
+}

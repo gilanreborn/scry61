@@ -27,6 +27,5 @@ export default class Modal extends Component {
     `;
 
     render(view, this.$container);
-
   }
  }

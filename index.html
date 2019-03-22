@@ -19,16 +19,20 @@
 			<section class="results"></section>
 			<section class="deck"></section>
 			<section class="ui-overlay">
-				<div class="deck__peeker">
+				<div class="deck__peeker deck__peeker--right">
 					<div class="deck__peeker-item droppable" data-drop-target="main">MAIN</div>
 					<div class="deck__peeker-item droppable" data-drop-target="side">SIDE</div>
 					<div class="deck__peeker-item droppable" data-drop-target="remove">REMOVE</div>
+				</div>
+				<div class="deck__peeker deck__peeker--left">
+					<div class="deck__peeker-item droppable" data-drop-target="inspect">INSPECT</div>
 				</div>
 			</section>
 			<footer class="foot"></footer>
 		</main>
 		<div id="hidden-drag-bucket"></div>
 		<div id="modal">Y'all trippin'</div>
+		<div id="inspector"></div>
 	</div>
 </body>
 </html>

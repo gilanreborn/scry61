@@ -4,6 +4,7 @@
 	padding: 1em;
 	grid-area: search;
 	display: none;
+	max-height: 100%;
 }
 
 .search.show {

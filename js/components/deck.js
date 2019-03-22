@@ -96,7 +96,22 @@ export default class Deck extends Component {
 	saveDeck(e) {
 		const { deck } = app.state;
 		const Scry61 = window.localStorage;
+		// const deckList = {
+		// 	id: deck.id,
+		// 	title: deck.title,
+		// 	main: deck.main.reduce((acc, card) => {
+		// 		acc[card.name] = acc[card.name] || 0;
+		// 		acc[card.name] += 1;
+		// 		return acc;
+		// 	}, {}),
+		// 	side: deck.side.reduce((acc, card) => {
+		// 		acc[card.name] = acc[card.name] || 0;
+		// 		acc[card.name] += 1;
+		// 		return acc;
+		// 	}, {}),
+		// };
 
+		// debugger;
 		if (deck.title) {
 			const Scry61 = window.localStorage;
 			Scry61.setItem(deck.id, JSON.stringify(deck));
@@ -164,7 +179,7 @@ export default class Deck extends Component {
 					</div>
 					`,
 				})}
-			<div class="deck__list flex--col">
+			<div class="deck__list flex--col scrollable">
 				<div class="deck__list--main droppable"
 					data-drop-target="main"
 				>
