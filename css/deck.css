@@ -5,7 +5,6 @@
 	width: 0;
 	flex-direction: column;
 	position: relative;
-	max-height: 100%;
 }
 
 .deck.show {
@@ -17,11 +16,13 @@
 	font-family: Cinzel;
 	display: flex;
 	justify-content: center;
+	flex: 1 0 auto;
 }
 
 .deck__options {
 	padding: 1em;
 	font-family: Cinzel;
+	flex: 1 0 auto;
 }
 
 .deck__options__save {
@@ -32,10 +33,21 @@
 	padding: .25em;
 }
 
+.deck__list__wrapper {
+	flex: 1 1 100%;
+}
+
 .deck__list {
 	min-height: 500px;
 	margin-right: -1em;
 	padding-right: 1em;
+	overflow-y: scroll;
+	max-height: 100%;
+	flex: 99 0 auto;
+}
+
+.deck__list > * {
+	flex: 1 0 auto;
 }
 
 .deck__list__category {
@@ -54,6 +66,10 @@
 .deck__list__item {
 	display: flex;
 	justify-content: space-between;
+}
+
+.deck__footer {
+	flex: 1 0 auto;
 }
 
 .card__count {
@@ -78,7 +94,7 @@
 	background: var(--theme-color-3);
 	z-index: 2;
 	border: 1px solid gray;
-	overflow: hidden;
+
 }
 
 .deck__peeker--right {
@@ -104,8 +120,12 @@
 	left: 0;
 }
 
-.deck__list--main, .deck__list--side {
+.deck__list--main {
 	padding-bottom: 1em;
+}
+
+.deck__list--side {
+	padding-bottom: 300px;
 }
 
 .deck__import__li {
@@ -116,6 +136,8 @@
 .deck__import__li:hover {
 	color: var(--highlight-color-1);
 }
+
+
 
 @media screen and (max-width: 480px) {
 	.deck.show {

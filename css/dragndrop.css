@@ -13,6 +13,7 @@
 #hidden-drag-bucket {
   position: fixed;
   bottom: -99999px;
+  z-index: 99;
 }
 
 #hidden-drag-bucket > * {

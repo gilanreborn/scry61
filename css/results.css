@@ -2,6 +2,7 @@
 	grid-area: results;
 	display: none;
 	padding: 1em;
+
 }
 
 .results.show {
@@ -138,6 +139,10 @@
 
 .results__list-item {
 	display: inline-block;
+}
+
+.results__list-item--text {
+	padding: 1rem;
 }
 
 .results__no-results {

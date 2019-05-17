@@ -166,13 +166,13 @@ export default class UI extends Component {
 			dragImage.style.left = e.targetTouches[0].pageX + 'px';
 			dragImage.style.top = e.targetTouches[0].pageY + 'px';
 			dragImage.style.opacity = 0.5;
-			dragImage.style.zIndex = '11';
+			dragImage.style.zIndex = 13;
 			q('#hidden-drag-bucket')[0].appendChild(dragImage);
 		}
 	}
 
 	handleTouchMove(e) {
-		console.log('touchmove', new Date());
+		console.log(e);
 		const dragImage = q('#hidden-drag-bucket')[0].firstChild;
 		if (e.targetTouches.length == 1 && dragImage) {
 			const dragX = e.targetTouches[0].pageX;

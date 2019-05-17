@@ -1,6 +1,6 @@
 .accordion {
   border-left: none;
-  overflow: hidden;
+
   cursor: pointer;
   outline: none;
 }

@@ -10,7 +10,7 @@ export default class Search extends Component {
 		super(options);
 
 		this._state = {
-			mode: 'comfortable',
+			mode: 'minimal',
 		};
 	}
 
@@ -299,7 +299,6 @@ export default class Search extends Component {
 						</select>
 					</span>
 				</div>
-
 				${this.buildSearchInput({ ...this.optionsFor('Name'), value: cardName })}
 				<fieldset class="search__fieldset color-picker">
 					<legend>Color</legend>

@@ -1,11 +1,11 @@
 .expando {
-	overflow: hidden;
+
 	flex-shrink: 0;
 }
 
 .expando .expando-box {
 	position: relative;
-	overflow: hidden;
+
 	border: 1px solid var(--theme-color-1);
 	height: auto;
 	max-height: 0;

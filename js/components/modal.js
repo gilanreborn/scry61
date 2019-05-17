@@ -16,12 +16,17 @@ export default class Modal extends Component {
       <div class="modal-wrapper modal-wrapper--${show ? 'show' : 'hide'}">
         <div class="modal-hider" @click="${this.closeModal}"></div>
         <div class="modal-container">
+
+
           <div class="modal__header">
             <h3>${title}</h3><span class="modal__close" @click="${this.closeModal}">&times;</span>
           </div>
-          <ul class="modal__content">
-            ${content}
-          </ul>
+          <div class="modal__content__wrapper">
+            <div class="modal__content">
+              ${content}
+            </div>
+          </div>
+
         </div>
       </div>
     `;

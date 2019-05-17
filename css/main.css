@@ -12,20 +12,21 @@
 
 @media screen and (max-width: 480px) {
 	.main {
-		width: 100%;
-		display: grid;
 		grid-template-areas:
 			"head head head"
 			"search search search"
 			"results results results"
 			"deck deck deck"
 			"foot foot foot";
-		grid-template-rows: auto 1fr auto;
 		grid-template-columns: 1fr 1fr 1fr;
 	}
 }
 
 .scrollable {
+	height: 100%;
 	overflow-y: scroll;
 }
 
+.foot {
+	grid-area: foot;
+}

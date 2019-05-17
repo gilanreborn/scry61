@@ -5,6 +5,7 @@ import image from './card/image.js';
 import text from './card/text.js';
 import expando from './expando.js';
 import pagination from './pagination.js';
+import list from './card/list.js';
 
 export default class Results extends Component {
 	constructor(options) {
@@ -101,16 +102,14 @@ export default class Results extends Component {
 		const pageCountCurrent = page + 1;
 		const pageCountTotal = ~~(results.length / pageSize) + 1;
 
-		const modes = {
-			image: (card, printing) => image({ card, printing }),
-			text: (card, printing) => text({ card, printing }),
-		};
+		const resultsList = list({
+			cards: sortedResults.slice(page * pageSize, (page + 1) * pageSize),
+			view: cardView,
+			klass: 'results',
+			collapsed: false,
+			imgSize,
+		});
 
-		const resultsList = sortedResults.slice(page * pageSize, (page + 1) * pageSize).map(card => html`
-			<li class="results__list-item card__container card-view--${cardView}" style="width: ${imgSize}px">
-				${modes[cardView](card, card.printings[0])}
-			</li>
-		`);
 		const noResults = html`<li class="results__no-results">The specimen seems to be broken</li>`;
 
 		const view = html`
@@ -124,7 +123,7 @@ export default class Results extends Component {
 								class="results__header__page-size-input"
 								@change=${this.updatePageSize.bind(this)}
 								.value=${pageSize}
-							></input>
+							/>
 							per page
 						</span>
 					</div>
@@ -171,9 +170,9 @@ export default class Results extends Component {
 							</fieldset>
 					</div>`
 				})}
-				<ul class="results__list scrollable" style="font-size: ${imgSize / 12}px">
-					${resultsList.length ? resultsList : noResults}
-				</ul>
+				<div class="results__list__wrapper" style="font-size: ${imgSize / 12}px">
+					${sortedResults.length ? resultsList : noResults}
+				</div>
 				<div class="results__footer">
 					<div class="results__footer__pagination">
 					${pagination({ page, pageCountCurrent, pageCountTotal, callback: this.updatePage.bind(this), klass: 'footer' })}

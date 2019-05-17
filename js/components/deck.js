@@ -6,10 +6,56 @@ import text from './card/text.js';
 import titleBox from './card/titleBox.js';
 import expando from './expando.js';
 import pagination from './pagination.js';
+import list from './card/list.js';
 
 export default class Deck extends Component {
 	constructor(options) {
 		super(options);
+	}
+
+	autoDetectFormat() {
+		return 'modern';
+	}
+
+	autoPopulateManabase() {
+		let { main, side } = app.state.deck;
+		let format = this.autoDetectFormat();
+		let colorPie = main.reduce((pie, card) => {
+			card.manaCost && card.manaCost.split(/{|}/g).filter(m => m.length).map(m => {
+				let wt = m.includes('/') ? .5 : 1;
+				m.split('').filter(s => 'WUBRG'.includes(s)).map(x => pie[x] = (pie[x] ? pie[x] : 0) + wt);
+			});
+			return pie;
+		}, { W: 0, U: 0, B: 0, R: 0, G: 0 });
+		const cardScore = card => 'WUBRG'.split('').reduce((acc, color) => {
+			const add = card.colorIdentity.includes(color) ? 1 : -1;
+			const basics = { W: 'Plains', U: 'Island', B: 'Swamp', R: 'Mountain', G: 'Forest' };
+			const basic = card.subtypes.includes(basics[color]) ? 1.5 : 1;
+			const rarity = { mythic: 2, rare: 1.5, uncommon: 1, common: 1, basic: 1 }[card.rarity];
+			return acc + colorPie[color] * add * basic * rarity;
+		}, 0);
+		const suggestions = cards
+			.filter(card => card.type.includes('Land') && card.legalities[format] == 'Legal')
+			.sort((a, b) => cardScore(a) < cardScore(b) ? 1 : -1)
+			.slice(0, 20);
+
+		app.dispatch({
+			type: 'SET_MODAL_CONTENT',
+			payload: {
+				content: html`
+					<div>${JSON.stringify(colorPie)}</div>
+					${list({ cards: suggestions })}
+				`,
+				title: 'Suggested Lands',
+			},
+		});
+		app.dispatch({ type: 'SHOW_MODAL' });
+	}
+
+	analyzeColors() {
+		return {
+			WUBRG: '',
+		};
 	}
 
 	buildDeckObj(cardList = []) {
@@ -96,22 +142,6 @@ export default class Deck extends Component {
 	saveDeck(e) {
 		const { deck } = app.state;
 		const Scry61 = window.localStorage;
-		// const deckList = {
-		// 	id: deck.id,
-		// 	title: deck.title,
-		// 	main: deck.main.reduce((acc, card) => {
-		// 		acc[card.name] = acc[card.name] || 0;
-		// 		acc[card.name] += 1;
-		// 		return acc;
-		// 	}, {}),
-		// 	side: deck.side.reduce((acc, card) => {
-		// 		acc[card.name] = acc[card.name] || 0;
-		// 		acc[card.name] += 1;
-		// 		return acc;
-		// 	}, {}),
-		// };
-
-		// debugger;
 		if (deck.title) {
 			const Scry61 = window.localStorage;
 			Scry61.setItem(deck.id, JSON.stringify(deck));
@@ -176,32 +206,37 @@ export default class Deck extends Component {
 							<a @click="${this.saveDeck.bind(this)}">Save</a>
 							<a @click="${this.loadDeck.bind(this)}">Load</a>
 						</div>
+						<div class="deck__options__advanced flex">
+							<a @click="${this.autoPopulateManabase.bind(this)}" title="Generate Lands">Scapeshift</a>
+						</div>
 					</div>
 					`,
 				})}
-			<div class="deck__list flex--col scrollable">
-				<div class="deck__list--main droppable"
-					data-drop-target="main"
-				>
-					<span @click=${e => e.currentTarget.classList.toggle('collapsed')}>
-						<strong>MAIN</strong> <span>(${main.length && main.length})</span>
-					</span>
-					<ul class="deck__list__main">
-						${mainList}
-					</ul>
-				</div>
-				<div class="deck__list--side droppable"
-					data-drop-target="side"
-				>
-					<span @click=${e => e.currentTarget.classList.toggle('collapsed')}>
-						<strong>SIDE</strong> <span>(${side.length && side.length})</span>
-					</span>
-					<ul class="deck__list__side">
-						${sideList}
-					</ul>
+			<div class="deck__list__wrapper">
+				<div class="deck__list flex--col scrollable">
+					<div class="deck__list--main droppable"
+						data-drop-target="main"
+					>
+						<span @click=${e => e.currentTarget.classList.toggle('collapsed')}>
+							<strong>MAIN</strong> <span>(${main.length && main.length})</span>
+						</span>
+						<ul class="deck__list__main">
+							${mainList}
+						</ul>
+					</div>
+					<div class="deck__list--side droppable"
+						data-drop-target="side"
+					>
+						<span @click=${e => e.currentTarget.classList.toggle('collapsed')}>
+							<strong>SIDE</strong> <span>(${side.length && side.length})</span>
+						</span>
+						<ul class="deck__list__side">
+							${sideList}
+						</ul>
+					</div>
 				</div>
 			</div>
-			<div class="deck__footer"></div>
+			<div class="deck__footer">Deck Footer Test</div>
 		`;
 
 		render(view, this.$container);

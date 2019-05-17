@@ -14,25 +14,25 @@
 <body>
 	<div id="root">
 		<main class="main main__grid-container">
-			<header class="header"></header>
+			<header class="header" style="background: #444"></header>
 			<section class="search"></section>
 			<section class="results"></section>
 			<section class="deck"></section>
-			<section class="ui-overlay">
-				<div class="deck__peeker deck__peeker--right">
-					<div class="deck__peeker-item droppable" data-drop-target="main">MAIN</div>
-					<div class="deck__peeker-item droppable" data-drop-target="side">SIDE</div>
-					<div class="deck__peeker-item droppable" data-drop-target="remove">REMOVE</div>
-				</div>
-				<div class="deck__peeker deck__peeker--left">
-					<div class="deck__peeker-item droppable" data-drop-target="inspect">INSPECT</div>
-				</div>
-			</section>
-			<footer class="foot"></footer>
+			<footer class="foot" style="background: #444">Foot Fooot Foot</footer>
 		</main>
 		<div id="hidden-drag-bucket"></div>
-		<div id="modal">Y'all trippin'</div>
+		<div id="modal" data-drop-target="results">Y'all trippin'</div>
 		<div id="inspector"></div>
+		<div class="ui-overlay">
+			<div class="deck__peeker deck__peeker--right">
+				<div class="deck__peeker-item droppable" data-drop-target="main">MAIN</div>
+				<div class="deck__peeker-item droppable" data-drop-target="side">SIDE</div>
+				<div class="deck__peeker-item droppable" data-drop-target="remove">REMOVE</div>
+			</div>
+			<div class="deck__peeker deck__peeker--left">
+				<div class="deck__peeker-item droppable" data-drop-target="inspect">INSPECT</div>
+			</div>
+		</div>
 	</div>
 </body>
 </html>
