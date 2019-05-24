@@ -1,9 +1,10 @@
 .inspector {
   display: none;
   flex-wrap: wrap;
+  background-color: var(--theme-color-3);
 }
 
-.dialog .inspector {
+.modal .inspector {
   display: flex;
 }
 

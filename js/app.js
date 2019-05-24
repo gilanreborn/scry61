@@ -7,8 +7,8 @@ import Accordion from './components/accordion.js';
 import Results from './components/results.js';
 import Search from './components/search.js';
 import Deck from './components/deck.js';
+import Inspector from './components/inspector.js';
 import Modal from './components/modal.js';
-import Inspector from './components/inspector.js'
 
 window.q = q;
 
@@ -26,15 +26,15 @@ export default class UI extends Component {
 		const search = new Search({ $container: q('.search')[0] });
 		const results = new Results({ $container: q('.results')[0] });
 		const deck = new Deck({ $container: q('.deck')[0] });
-		const modal = new Modal({ $container: q('#modal')[0] });
 		const inspector = new Inspector({ $container: q('#inspector')[0] });
+		const modal = new Modal({ $container: q('#modal')[0] });
 		this.children = [
 			nav,
 			search,
 			results,
 			deck,
-			modal,
 			inspector,
+			modal,
 		];
 	}
 
@@ -45,11 +45,7 @@ export default class UI extends Component {
 		// this.on('dragend', 'main', this.handleDrop);
 		this.on('dragstart', '.draggable', this.handleDragStart.bind(this));
 		this.on('drop', '.droppable', this.handleDrop.bind(this));
-		this.on('click', '.dialog', function(e) {
-			if ( e.target === e.delegateTarget ) {
-				e.target.classList.remove('dialog');
-			}
-		});
+		this.on('click', '.modal', this.maybeCloseModal.bind(this));
 		document.addEventListener('touchstart', this.handleTouchStart.bind(this));
 		document.addEventListener('touchmove', this.handleTouchMove.bind(this));
 		document.addEventListener('touchend', this.handleTouchEnd.bind(this));
@@ -237,11 +233,15 @@ export default class UI extends Component {
 		switch (target) {
 			case 'inspect':
 				app.dispatch({ type: 'INSPECT_CARD', payload: card });
-				q('#inspector')[0].classList.add('dialog');
+				q('#inspector')[0].classList.add('modal');
 			break;
 			default:
 				break;
 		}
+	}
+
+	maybeCloseModal(e) {
+		if ( e.target === e.delegateTarget ) { e.target.classList.remove('modal'); }
 	}
 
 	update(props, oldProps) {

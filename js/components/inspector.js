@@ -28,10 +28,10 @@ export default class Inspector extends Component {
 	}
 
 	closeModal() {
-		app.dispatch({ type: 'HIDE_MODAL' });
+		q('.modal')[0] && q('.modal')[0].classList.remove('modal');
 	}
 
-	buildRadioGroup(options, { type, click }, currentlySelected) {
+	buildRadioGroup(options = [], { type, click }, currentlySelected) {
 		const radioButtons = options.map((opt, idx) => {
 			const id = type + opt + idx;
 			return html`
@@ -76,6 +76,16 @@ export default class Inspector extends Component {
 							</label>
 						</fieldset>
 					</form>
+					<div> related cards:
+						${this.buildRadioGroup(
+							card.names,
+							{
+								type: 'panel',
+								click: e => app.dispatch({ type: 'INSPECT_CARD', payload: cards.filter(c => c.name === e.target.value)[0] })
+							},
+							panel
+						)}
+					</div>
 					<div>
 						<h5>Rulings:</h5>
 						<ul class="inspector__rulings" >

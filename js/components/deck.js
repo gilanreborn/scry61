@@ -1,6 +1,6 @@
+import { html, svg, render } from '/node_modules/lit-html/lit-html.js';
 import Component from './component.js';
 import icon from '../templates/icon.js';
-import { html, svg, render } from '/node_modules/lit-html/lit-html.js';
 import image from './card/image.js';
 import text from './card/text.js';
 import titleBox from './card/titleBox.js';
@@ -154,6 +154,21 @@ export default class Deck extends Component {
 		const Scry61 = window.localStorage;
 		const deckIds = Object.keys(Scry61);
 		const decks = deckIds.map(k => JSON.parse(Scry61[k]));
+
+		// const view = html`
+		// <ul>
+		// 	${decks.map(deck => html`
+		// 		<li class="deck__import__li"
+		// 			@click="${this.importDeck}"
+		// 			data-title="${deck.title}"
+		// 			data-id="${deck.id}"
+		// 		>
+		// 			${deck.title}
+		// 		</li>
+		// 	`)}
+		// </ul>
+		// ;`
+
 		app.dispatch({
 			type: 'SET_MODAL_CONTENT',
 			payload: {
@@ -169,7 +184,7 @@ export default class Deck extends Component {
 				title: 'Load A Deck',
 			},
 		});
-		app.dispatch({ type: 'SHOW_MODAL' });
+		q('#modal')[0].classList.add('modal');
 	}
 
 	importDeck(e) {
