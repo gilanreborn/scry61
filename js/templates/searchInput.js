@@ -1,4 +1,4 @@
-import { html, svg, render } from 'https://unpkg.com/lit-html?module';
+import { html, svg, render } from '/node_modules/lit-html/lit-html.js';
 import input from './input.js';
 
 export default function searchInput(options) {

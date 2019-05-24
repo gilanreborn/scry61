@@ -1,4 +1,4 @@
-import { html, svg, render } from 'https://unpkg.com/lit-html?module';
+import { html, svg, render } from '/node_modules/lit-html/lit-html.js';
 
 export default function icon(name) {
 	const paths = (symbol) => {
@@ -75,16 +75,8 @@ export default function icon(name) {
 
 	const src = paths(name);
 	if ( src ) {
-		return html`<img class="icon" src=${src} />`;
+		return html`<img class="icon" src="${src}" />`;
 	} else {
 		return html`<span>${name}</span>`;
 	}
 }
-
-
-// const style = {
-//   backgroundColor: 'transparent',
-//   height: '15px',
-//   width: '15px',
-//   margin: '0 0 -2px 0',
-// }

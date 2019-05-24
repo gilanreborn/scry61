@@ -1,9 +1,8 @@
+import { html, svg, render } from '/node_modules/lit-html/lit-html.js';
 import Component from './component.js';
 import icon from '../templates/icon.js';
-import svgIcon from '../templates/svgs/icon.js';
 import searchInput from '../templates/searchInput.js';
 import input from '../templates/input.js';
-import { html, svg, render } from 'https://unpkg.com/lit-html?module';
 
 export default class Search extends Component {
 	constructor(options) {

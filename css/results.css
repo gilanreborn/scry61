@@ -133,7 +133,6 @@
 	flex-wrap: wrap;
 	max-height: 85vh;
 	justify-content: center;
-	margin: 0 -1rem;
 	grid-area: list;
 }
 

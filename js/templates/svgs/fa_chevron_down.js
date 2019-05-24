@@ -1,4 +1,4 @@
-import { svg } from 'https://unpkg.com/lit-html?module';
+import { svg } from '/node_modules/lit-html/lit-html.js';
 
 export default svg`
 	<svg

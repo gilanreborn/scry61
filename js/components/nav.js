@@ -1,7 +1,6 @@
 import { q } from '../util/utils.js';
-import { html, render } from 'https://unpkg.com/lit-html?module';
+import { html, render } from '/node_modules/lit-html/lit-html.js';
 import Component from './component.js';
-import svgIcon from '../templates/svgs/icon.js';
 
 export default class Nav extends Component {
   constructor(options = {}) {

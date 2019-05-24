@@ -1,6 +1,6 @@
 import Component from './component.js';
 import icon from '../templates/icon.js';
-import { html, svg, render } from 'https://unpkg.com/lit-html?module';
+import { html, svg, render } from '/node_modules/lit-html/lit-html.js';
 import image from './card/image.js';
 import text from './card/text.js';
 import expando from './expando.js';

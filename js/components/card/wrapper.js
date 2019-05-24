@@ -1,4 +1,4 @@
-import { html, svg, render } from 'https://unpkg.com/lit-html?module';
+import { html, svg, render } from '/node_modules/lit-html/lit-html.js';
 
 export default function card({ card, view, printing, collapsed = false }) {
 

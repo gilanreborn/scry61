@@ -1,7 +1,7 @@
 const defaultState = {
 	page: 0,
 	pageSize: 48,
-	cardView: 'image',
+	cardView: 'text',
 	imgSize: 200,
 	moreOptions: false,
 	sorts: {},

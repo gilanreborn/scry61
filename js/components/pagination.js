@@ -1,4 +1,4 @@
-import { html } from 'https://unpkg.com/lit-html?module';
+import { html } from '/node_modules/lit-html/lit-html.js';
 
 export default function pagination({ page, pageCountCurrent, pageCountTotal, callback, klass }) {
 	return html`
