@@ -93,7 +93,7 @@ export default class Inspector extends Component {
 						</ul>
 					</div>
 				</div>
-				<div class="inspector__card inspector__card--${panel}">
+				<div class="inspector__card inspector__card--${panel} scrollable">
 					${panel === 'image' ? image({ card, printing }) : text({ card, printing })}
 				</div>
 			</section>

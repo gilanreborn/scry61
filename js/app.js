@@ -227,6 +227,15 @@ export default class UI extends Component {
 				app.dispatch({ type: 'REMOVE_CARD_FROM_SIDE', payload: card });
 				app.dispatch({ type: 'ADD_CARD_TO_MAIN', payload: card });
 				break;
+			case 'sample-hand --> battlefield':
+				app.dispatch({ type: 'MOVE_CARD', payload: { card, from: 'hand', to: 'battlefield' } });
+				break;
+			case 'battlefield --> graveyard':
+				app.dispatch({ type: 'MOVE_CARD', payload: { card, from: 'battlefield', to: 'graveyard' } });
+				break;
+			case 'sample-hand --> graveyard':
+				app.dispatch({ type: 'MOVE_CARD', payload: { card, from: 'hand', to: 'graveyard' } });
+				break;
 			default:
 				break;
 		}
@@ -262,7 +271,12 @@ window.addEventListener('load', function (e) {
 		);
 	}
 
-	var provider = window.app = createStore(rootReducer);
+	// check cache for saved preferences
+	const Scry61 = window.localStorage;
+	const preferences = Scry61['preferences'];
+	const initialState = preferences ? JSON.parse(preferences) : undefined;
+
+	var provider = window.app = createStore(rootReducer, initialState);
 	const view = new UI({ $container: q('#root')[0] });
 	provider.subscribe([ view ]);
 

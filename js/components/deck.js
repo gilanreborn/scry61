@@ -1,5 +1,6 @@
 import { html, svg, render } from '/node_modules/lit-html/lit-html.js';
 import Component from './component.js';
+import Game from './game.js';
 import icon from '../templates/icon.js';
 import image from './card/image.js';
 import text from './card/text.js';
@@ -49,7 +50,7 @@ export default class Deck extends Component {
 				title: 'Suggested Lands',
 			},
 		});
-		app.dispatch({ type: 'SHOW_MODAL' });
+		q('#modal')[0].classList.add('modal');
 	}
 
 	analyzeColors() {
@@ -127,6 +128,14 @@ export default class Deck extends Component {
 		return deckList;
 	}
 
+	drawSampleHand(e) {
+		const deck = [...app.state.deck.main];
+		q('#game')[0].classList.add('modal');
+		const game = new Game({ $container: q('#game')[0], deck });
+		game.update(app.state);
+		app.subscribe([game]);
+	}
+
 	setDeckTitle(e) {
 		const payload = e.target.value;
 		app.dispatch({
@@ -200,6 +209,11 @@ export default class Deck extends Component {
 		app.dispatch({ type: 'HIDE_MODAL' });
 	}
 
+	quickAdd(e) {
+		const matches = cards.filter(c => c.name.toLowerCase().indexOf(e.target.value.toLowerCase()) > -1);
+		console.log(matches.slice(0, 10));
+	}
+
 	update(props, oldProps) {
 		const { main, side, title } = props.deck;
 		const deckObj = this.buildDeckObj(main);
@@ -223,6 +237,7 @@ export default class Deck extends Component {
 						</div>
 						<div class="deck__options__advanced flex">
 							<a @click="${this.autoPopulateManabase.bind(this)}" title="Generate Lands">Scapeshift</a>
+							<a @click="${this.drawSampleHand.bind(this)}" title="Sample Hand">Goldfish</a>
 						</div>
 					</div>
 					`,
@@ -251,7 +266,9 @@ export default class Deck extends Component {
 					</div>
 				</div>
 			</div>
-			<div class="deck__footer">Replace this with an input that adds cards directly by name</div>
+			<div class="deck__footer">
+				<input type="text" @keyup="${this.quickAdd}" placeholder="Quick Add" />
+			</div>
 		`;
 
 		render(view, this.$container);

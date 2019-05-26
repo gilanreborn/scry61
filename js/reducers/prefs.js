@@ -17,7 +17,7 @@ const defaultState = {
 	},
 };
 
-const initialState = localStorage.getItem('preferences') || defaultState;
+const initialState = defaultState;
 
 export default function PreferencesReducer(state = initialState, action) {
 	const { type, payload } = action;
@@ -39,9 +39,6 @@ export default function PreferencesReducer(state = initialState, action) {
 				...state,
 				show: { ...state.show, [payload]: !state.show[payload] },
 			};
-		case 'SAVE_PREFERENCES':
-			window.localStorage.setItem('preferences', state);
-			return state;
 		case 'RESTORE_DEFAULTS':
 			// window.localStorage.clear();
 			return defaultState;

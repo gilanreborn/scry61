@@ -15,20 +15,29 @@ export default class Nav extends Component {
   reposition(e) {
     const [vPos, hPos] = e.target.value.toLowerCase().split(' ');
     this.setState({ vPos, hPos });
+    app.dispatch({ type: 'SET_NAV_POS', payload: { vPos, hPos } });
+  }
+
+  savePreferences(e) {
+    const Scry61 = window.localStorage;
+    Scry61.setItem('preferences', JSON.stringify(app.state));
   }
 
   setThemeColor1(e) {
     const data = e.target.value;
     q('html')[0].style.setProperty('--theme-color-1', data);
     q('meta[name="theme-color"]')[0].setAttribute('content', data);
+    app.dispatch({ type: 'SET_THEME_COLOR', payload: { primary: data } });
   }
   setThemeColor2(e) {
     const data = e.target.value;
     q('html')[0].style.setProperty('--theme-color-2', data);
+    app.dispatch({ type: 'SET_THEME_COLOR', payload: { secondary: data } });
   }
   setThemeColor3(e) {
     const data = e.target.value;
     q('html')[0].style.setProperty('--theme-color-3', data);
+    app.dispatch({ type: 'SET_THEME_COLOR', payload: { tertiary: data } });
   }
 
   toggleMenu(e) {
@@ -142,6 +151,7 @@ export default class Nav extends Component {
                 </div>
               </div>
             </li>
+            <li><a @click="${this.savePreferences}" >Save Preferences (TODO)</a></li>
             <li><span class="nav__menu__list-item nav__menu__list-item--spacer"> </span></li>
           </ul>
         </nav>

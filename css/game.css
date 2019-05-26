@@ -1,0 +1,56 @@
+.game {
+  display: grid;
+  grid-template-areas:
+    "battlefield battlefield graveyard"
+    "library hand graveyard"
+    "actions actions actions";
+  grid-template-rows: 60% 30% 10%;
+  grid-template-columns: auto 1fr auto;
+  padding: 1em;
+}
+
+.battlefield { grid-area: battlefield; }
+.battlefield > ul:empty { min-height: 200px; }
+.graveyard { grid-area: graveyard; width: 125px }
+.library { grid-area: library; }
+.hand { grid-area: hand; }
+.actions { grid-area: actions; }
+
+.sample-hand__list {
+  height: auto;
+}
+
+.sample-hand__list-item {
+  flex: 0 1 125px;
+}
+.sample-hand__list-item:hover {
+  transform: scale(1.25);
+  transition: all .15s ease;
+  z-index: 10;
+}
+
+.sample-battlefield__list {
+  display: flex;
+  flex-wrap: wrap;
+  height: auto;
+}
+
+.sample-battlefield__list-item {
+  flex: 0 1 125px;
+}
+
+.sample-graveyard__list {
+  display: flex;
+  flex-direction: column;
+}
+
+.sample-graveyard__list-item {
+  flex: 0 1 2em;
+  max-width: 100%;
+}
+
+.sample-graveyard__list-item:last-of-type {
+  flex: 1 auto;
+}
+
+.actions a { padding: .5em;}

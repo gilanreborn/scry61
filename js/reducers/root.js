@@ -6,6 +6,7 @@ import preferences from './prefs.js';
 import deck from './deck.js';
 import modal from './modal.js';
 import inspector from './inspector.js';
+import game from './game.js';
 
 export const rootReducer = combineReducers({
 	search,
@@ -15,4 +16,5 @@ export const rootReducer = combineReducers({
 	preferences,
 	modal,
 	inspector,
+	game,
 });

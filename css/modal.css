@@ -29,10 +29,11 @@
   cursor: pointer;
   font-size: 2.5rem;
   line-height: 1rem;
+  box-shadow: 0vh 0vh 100vh 20px black;
 }
 
 .modal:after:hover {
-  color: var(--highlight-color-1);
+  color: var(--theme-color-1);
 }
 
 /* .modal:before {
@@ -45,3 +46,11 @@
   left: 0;
   z-index: -1;
 } */
+
+/* BELOW ARE SPECIFIC MODAL STYLES */
+
+.sample-hand__list {
+  display: flex;
+  align-items: flex-end;
+  padding: 1em;
+}
