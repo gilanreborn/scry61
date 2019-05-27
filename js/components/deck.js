@@ -87,14 +87,18 @@ export default class Deck extends Component {
 
 		return cards.sort(byName)
 			.filter(unique)
-			.map(card => this.buildDeckListItem({ card, count: cardCount[card.name] }));
+			.map(card => this.buildDeckListItem({ card, count: cardCount[card.name], location }));
 	}
 
-	buildDeckListItem({ card, count }) {
+	buildDeckListItem({ card, count, location }) {
 		return html`
 			<li class="deck__list__item">
 				<span class="card__count">
 					${count}
+					<div class="card__count__controls">
+						<a class="card__count__controls--increment" @click=${e => this.incrementCount(card, location)}>+</a><br>
+						<a class="card__count__controls--decrement" @click=${e => this.decrementCount(card, location)}>&ndash;</a>
+					</div>
 				</span>
 				<span class="card card__wrapper">
 					${text({ card, collapsed: true })}
@@ -103,7 +107,7 @@ export default class Deck extends Component {
 		`;
 	}
 
-	buildDeckList({ deckObj }) {
+	buildDeckList({ deckObj, location }) {
 		const deckList = Object.keys(deckObj).sort().map(cardType => {
 			const cards = deckObj[cardType];
 			if ( !cards.length ) { return }; // no cards of the given type
@@ -116,7 +120,7 @@ export default class Deck extends Component {
 						<span>(${cards.length})</span>
 					</span>
 					<ul class="deck__list__category__list">
-						${this.buildCardList.bind(this)({ cards })}
+						${this.buildCardList.bind(this)({ cards, location })}
 					</ul>
 				</li>
 			`;
@@ -220,11 +224,21 @@ export default class Deck extends Component {
 		app.dispatch({ type: 'IMPORT_DECKLIST', payload: deck, });
 	}
 
+	incrementCount(card, location) {
+		app.dispatch({ type: 'ADD_CARD_TO_' + location.toUpperCase(), payload: card });
+	}
+
+	decrementCount(card, location) {
+		app.dispatch({ type: 'REMOVE_CARD_FROM_' + location.toUpperCase(), payload: card });
+	}
+
 	quickAdd(e) {
 		const matches = cards.filter(c => c.name.toLowerCase().indexOf(e.target.value.toLowerCase()) > -1)
 			.sort((a, b) => a.name.length > b.name.length ? 1 : -1);
 		app.dispatch({ type: 'QUICK_ADD', payload: e.target.value ? matches : [] });
-		q('.deck__quick-add')[0].classList.add('modal');
+		if ( e.target.value ) {
+			q('.deck__quick-add')[0].classList.add('modal');
+		}
 	}
 
 	quickAddClose(e) {
@@ -235,8 +249,8 @@ export default class Deck extends Component {
 		const { id, main, side, title, quickAdd } = props.deck;
 		const deckObj = this.buildDeckObj(main);
 		const sideObj = this.buildDeckObj(side);
-		const mainList = this.buildDeckList({ deckObj });
-		const sideList = this.buildDeckList({ deckObj: sideObj });
+		const mainList = this.buildDeckList({ deckObj, location: 'main' });
+		const sideList = this.buildDeckList({ deckObj: sideObj, location: 'side' });
 
 		const view = html`
 			<div class="deck__header">

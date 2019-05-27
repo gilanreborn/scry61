@@ -81,6 +81,35 @@
 	padding: .5em;
 	font-size: 1.1rem;
 	padding-left: 0;
+	position: relative;
+}
+
+.card__count:hover .card__count__controls {
+	left: 0;
+}
+
+.card__count__controls {
+	position: absolute;
+	top: 2em;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	left: -2.5em;
+	transition: all .15s ease;
+}
+
+.card__count__controls a {
+	border-radius: 50%;
+	height: 1em;
+	width: 1em;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.card__count__controls a:hover {
+	background: var(--theme-color-2);
 }
 
 .card__wrapper {
@@ -141,11 +170,12 @@
 	padding: 0 1em;
 }
 
+.deck__quick-add {
+	height: 0;
+}
+
 .quick-add__list {
-	max-height: 25vh;
 	height: auto;
-	position: absolute;
-	bottom: 2em;
 	background-color: var(--theme-color-3);
 	padding: 0 1em;
 	width: 100%;
