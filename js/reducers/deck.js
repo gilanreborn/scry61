@@ -5,6 +5,7 @@ const defaultState = {
 	title: '',
 	main: [],
 	side: [],
+	quickAdd: [],
 };
 
 const initialState = defaultState;
@@ -22,15 +23,17 @@ export default function DeckReducer(state = initialState, action) {
 		case 'REMOVE_CARD_FROM_SIDE':
 			var i = state.side.findIndex(card => card.name === payload.name);
 			return { ...state, side: state.side.filter((_, idx) => idx !== i) };
+		case 'QUICK_ADD':
+			return { ...state, quickAdd: payload };
 		case 'RESTORE_DECK_DEFAULTS':
 			// window.localStorage.clear();
 			return defaultState;
 		case 'SET_DECK_TITLE':
 			return { ...state, title: payload };
 		case 'IMPORT_DECKLIST':
-			return payload;
+			return { ...state, ...payload };
 		case 'MAKE_NEW_DECK':
-			return { ...defaultState, id: Date.now() };
+			return { ...defaultState, title: '', id: Date.now() };
 		default:
 			return state;
 	}

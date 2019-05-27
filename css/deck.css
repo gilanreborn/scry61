@@ -9,7 +9,7 @@
 
 .deck.show {
 	display: flex;
-	min-width: 340px;
+	min-width: 375px;
 }
 
 .deck__header {
@@ -70,6 +70,7 @@
 
 .deck__footer {
 	flex: 1 0 auto;
+	position: relative;
 }
 
 .card__count {
@@ -136,7 +137,30 @@
 	color: var(--highlight-color-1);
 }
 
+.suggested-lands {
+	padding: 0 1em;
+}
 
+.quick-add__list {
+	max-height: 25vh;
+	height: auto;
+	position: absolute;
+	bottom: 2em;
+	background-color: var(--theme-color-3);
+	padding: 0 1em;
+	width: 100%;
+}
+
+.quick-add-close {
+	position: absolute;
+	top: 0;
+	right: 0;
+	font-size: 1.5rem;
+	cursor: pointer;
+}
+.quick-add-close:hover {
+	color: var(--highlight-color-1);
+}
 
 @media screen and (max-width: 480px) {
 	.deck.show {

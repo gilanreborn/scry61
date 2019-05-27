@@ -32,7 +32,7 @@ export default class Deck extends Component {
 			const add = card.colorIdentity.includes(color) ? 1 : -1;
 			const basics = { W: 'Plains', U: 'Island', B: 'Swamp', R: 'Mountain', G: 'Forest' };
 			const basic = card.subtypes.includes(basics[color]) ? 1.5 : 1;
-			const rarity = { mythic: 2, rare: 1.5, uncommon: 1, common: 1, basic: 1 }[card.rarity];
+			const rarity = { mythic: 2.5, rare: 1.5, uncommon: 1, common: 1, basic: 3 }[card.rarity];
 			return acc + colorPie[color] * add * basic * rarity;
 		}, 0);
 		const suggestions = cards
@@ -44,19 +44,15 @@ export default class Deck extends Component {
 			type: 'SET_MODAL_CONTENT',
 			payload: {
 				content: html`
-					<div>${JSON.stringify(colorPie)}</div>
-					${list({ cards: suggestions })}
+					<div class="suggested-lands" data-drop-target="results">
+						<div>${JSON.stringify(colorPie)}</div>
+						${list({ cards: suggestions })}
+					</div>
 				`,
 				title: 'Suggested Lands',
 			},
 		});
 		q('#modal')[0].classList.add('modal');
-	}
-
-	analyzeColors() {
-		return {
-			WUBRG: '',
-		};
 	}
 
 	buildDeckObj(cardList = []) {
@@ -120,12 +116,33 @@ export default class Deck extends Component {
 						<span>(${cards.length})</span>
 					</span>
 					<ul class="deck__list__category__list">
-						${this.buildCardList({ cards })}
+						${this.buildCardList.bind(this)({ cards })}
 					</ul>
 				</li>
 			`;
 		});
 		return deckList;
+	}
+
+	compressDeckList(cards = []) {
+		return cards.reduce((acc, card) => {
+			acc[card.name] = acc[card.name] || 0;
+			acc[card.name] += 1;
+			return acc;
+		}, {});
+	}
+
+	decompressDeckList(listObj) {
+		const cardNames = Object.keys(listObj);
+		return cardNames.reduce((acc, name, idx) => {
+			const card = window.cards.filter(c => c.name === name)[0];
+			let count = listObj[name];
+			while (count > 0) {
+				acc.push(card);
+				count--;
+			}
+			return acc;
+		}, []);
 	}
 
 	drawSampleHand(e) {
@@ -150,10 +167,16 @@ export default class Deck extends Component {
 
 	saveDeck(e) {
 		const { deck } = app.state;
+		const { id, title, main, side } = deck;
 		const Scry61 = window.localStorage;
 		if (deck.title) {
-			const Scry61 = window.localStorage;
-			Scry61.setItem(deck.id, JSON.stringify(deck));
+			const compressedList = {
+				id,
+				title,
+				main: this.compressDeckList(main),
+				side: this.compressDeckList(side),
+			};
+			Scry61.setItem(deck.id, JSON.stringify(compressedList));
 		} else {
 			alert('Please name your deck.');
 		}
@@ -161,61 +184,55 @@ export default class Deck extends Component {
 
 	loadDeck(e) {
 		const Scry61 = window.localStorage;
-		const deckIds = Object.keys(Scry61);
+		const deckIds = Object.keys(Scry61).filter(k => k !== 'preferences');
 		const decks = deckIds.map(k => JSON.parse(Scry61[k]));
-
-		// const view = html`
-		// <ul>
-		// 	${decks.map(deck => html`
-		// 		<li class="deck__import__li"
-		// 			@click="${this.importDeck}"
-		// 			data-title="${deck.title}"
-		// 			data-id="${deck.id}"
-		// 		>
-		// 			${deck.title}
-		// 		</li>
-		// 	`)}
-		// </ul>
-		// ;`
-
-		app.dispatch({
-			type: 'SET_MODAL_CONTENT',
-			payload: {
-				content: decks.map(deck => html`
+		const title = 'Load A Deck';
+		const content = html`
+			<ul class="deck__import__ul">
+				${decks.map(deck => html`
 					<li class="deck__import__li"
-						@click="${this.importDeck}"
+						@click="${this.importDeck.bind(this)}"
 						data-title="${deck.title}"
 						data-id="${deck.id}"
 					>
 						${deck.title}
 					</li>
-				`),
-				title: 'Load A Deck',
-			},
-		});
+				`)}
+			</ul>
+		`;
+
+		app.dispatch({ type: 'SET_MODAL_CONTENT', payload: { content, title } });
 		q('#modal')[0].classList.add('modal');
 	}
 
 	importDeck(e) {
 		const deckId = e.target.dataset.id;
 		const json = window.localStorage[deckId];
-		const deck = JSON.parse(json);
+		const { id, title, main, side } = JSON.parse(json);
 
-		app.dispatch({
-			type: 'IMPORT_DECKLIST',
-			payload: deck,
-		});
+		const deck = {
+			id,
+			title,
+			main: this.decompressDeckList(main),
+			side: this.decompressDeckList(side),
+		};
 
-		app.dispatch({ type: 'HIDE_MODAL' });
+		app.dispatch({ type: 'IMPORT_DECKLIST', payload: deck, });
 	}
 
 	quickAdd(e) {
-		const matches = cards.filter(c => c.name.toLowerCase().indexOf(e.target.value.toLowerCase()) > -1);
-		console.log(matches.slice(0, 10));
+		const matches = cards.filter(c => c.name.toLowerCase().indexOf(e.target.value.toLowerCase()) > -1)
+			.sort((a, b) => a.name.length > b.name.length ? 1 : -1);
+		app.dispatch({ type: 'QUICK_ADD', payload: e.target.value ? matches : [] });
+		q('.deck__quick-add')[0].classList.add('modal');
+	}
+
+	quickAddClose(e) {
+		app.dispatch({ type: 'QUICK_ADD', payload: [] });
 	}
 
 	update(props, oldProps) {
-		const { main, side, title } = props.deck;
+		const { id, main, side, title, quickAdd } = props.deck;
 		const deckObj = this.buildDeckObj(main);
 		const sideObj = this.buildDeckObj(side);
 		const mainList = this.buildDeckList({ deckObj });
@@ -267,7 +284,11 @@ export default class Deck extends Component {
 				</div>
 			</div>
 			<div class="deck__footer">
-				<input type="text" @keyup="${this.quickAdd}" placeholder="Quick Add" />
+				<div class="deck__quick-add" data-drop-target="results">
+					${list({ cards: quickAdd, view: 'text', klass: 'quick-add' })}
+				</div>
+				<input type="text" @change="${this.quickAdd}" placeholder="Quick Add" />
+				<span type="button" class="quick-add-close" title="clear" @click=${this.quickAddClose}>&times;</sp>
 			</div>
 		`;
 
